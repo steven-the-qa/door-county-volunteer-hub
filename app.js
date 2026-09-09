@@ -5,11 +5,13 @@
   "use strict";
 
   // --- Config -------------------------------------------------------------
-  // After activating FormSubmit (submit the form once, click the link in the
-  // email), replace this with the AJAX ALIAS endpoint from that email, e.g.
-  // "https://formsubmit.co/ajax/a1b2c3d4e5f6...". Using the alias keeps the
-  // inbox address out of the page source.
-  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/REPLACE_WITH_FORMSUBMIT_ALIAS";
+  // ACTIVATION (one time): this is the raw-address endpoint. Submit the form once
+  // (locally or on the live site) — FormSubmit emails cosmicbobsleigh@gmail.com an
+  // activation link plus a permanent random alias. Click the link, then replace the
+  // line below with the alias endpoint, e.g.
+  //   "https://formsubmit.co/ajax/a1b2c3d4e5f6..."
+  // The alias keeps the inbox address out of the page source, so don't skip that swap.
+  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/cosmicbobsleigh@gmail.com";
 
   var DATA_URL = "data/opportunities.json";
 
