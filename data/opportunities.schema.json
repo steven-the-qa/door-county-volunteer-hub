@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Door County Volunteer Hub data file",
+  "type": "object",
+  "required": ["meta", "organizations", "opportunities"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["lastUpdated", "contactEmail"],
+      "additionalProperties": true,
+      "properties": {
+        "lastUpdated": { "type": "string", "format": "date" },
+        "contactEmail": { "type": "string" },
+        "demoData": { "type": "boolean" },
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "commitmentTypes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "organizations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "name": { "type": "string" },
+          "website": { "type": "string" },
+          "location": { "type": "string" },
+          "blurb": { "type": "string" },
+          "partnerStatus": { "enum": ["active", "prospective", "paused", "former"] }
+        }
+      }
+    },
+    "opportunities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "orgId", "title", "description", "commitment",
+          "status", "verified", "postedDate", "expiresDate"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "orgId": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "categories": { "type": "array", "items": { "type": "string" } },
+          "commitment": { "enum": ["one-time", "recurring", "flexible"] },
+          "schedule": { "type": "string" },
+          "location": { "type": "string" },
+          "minAge": { "type": "integer", "minimum": 0 },
+          "status": { "enum": ["open", "filled", "paused", "closed", "draft"] },
+          "verified": { "type": "boolean" },
+          "verifiedDate": { "type": "string", "format": "date" },
+          "postedDate": { "type": "string", "format": "date" },
+          "expiresDate": { "type": "string", "format": "date" },
+          "coordinator": { "type": "string" }
+        }
+      }
+    }
+  }
+}

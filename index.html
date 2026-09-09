@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Door County Volunteer Hub</title>
+  <meta name="description" content="Current, verified volunteer opportunities with nonprofits in Door County, Wisconsin." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A4%9D%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#opportunities">Skip to opportunities</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="index.html">
+        <span aria-hidden="true">🤝</span> Door County Volunteer Hub
+      </a>
+      <nav aria-label="Primary">
+        <a href="about.html">About</a>
+        <a href="privacy.html">Privacy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>Volunteer opportunities in Door County</h1>
+      <p class="lede">
+        A short, verified list of what local nonprofits need help with right now.
+        Find something that fits, send your name and email, and a real person
+        (Sam) will connect you with the organization within about two business days.
+      </p>
+      <p id="demo-banner" class="banner" hidden>
+        Heads up: this list is showing <strong>example data</strong> while we onboard
+        our first partner organizations. Real opportunities are coming soon.
+      </p>
+    </section>
+
+    <section class="filters" aria-label="Filter opportunities">
+      <div class="field">
+        <label for="filter-org">Organization</label>
+        <select id="filter-org"><option value="">All organizations</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-category">Category</label>
+        <select id="filter-category"><option value="">All categories</option></select>
+      </div>
+      <div class="field">
+        <label for="filter-commitment">Commitment</label>
+        <select id="filter-commitment">
+          <option value="">Any commitment</option>
+          <option value="one-time">One-time</option>
+          <option value="recurring">Recurring</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
+      <button type="button" id="filter-reset" class="link-button">Reset</button>
+    </section>
+
+    <p id="result-count" class="result-count" aria-live="polite"></p>
+
+    <section id="opportunities" aria-label="Opportunities">
+      <ol id="opportunity-list" class="cards"></ol>
+
+      <p id="empty-state" class="empty" hidden>
+        No opportunities match those filters right now.
+      </p>
+
+      <div id="load-error" class="empty" hidden>
+        <p>We couldn't load the opportunity list.</p>
+        <p>Email us at <a id="error-email" href="mailto:cosmicbobsleigh@gmail.com">cosmicbobsleigh@gmail.com</a> and we'll help you find a way to volunteer.</p>
+      </div>
+
+      <noscript>
+        <p class="empty">
+          This list needs JavaScript to load. You can still reach us directly at
+          <a href="mailto:cosmicbobsleigh@gmail.com">cosmicbobsleigh@gmail.com</a>.
+        </p>
+      </noscript>
+    </section>
+  </main>
+
+  <dialog id="interest-dialog">
+    <form id="interest-form" method="dialog">
+      <h2>Express interest</h2>
+      <p class="dialog-context">
+        You're interested in <strong id="dialog-opportunity">this opportunity</strong>
+        at <strong id="dialog-org">the organization</strong>.
+      </p>
+
+      <div class="field">
+        <label for="f-first">First name</label>
+        <input id="f-first" name="First Name" type="text" autocomplete="given-name" required />
+      </div>
+      <div class="field">
+        <label for="f-last">Last name</label>
+        <input id="f-last" name="Last Name" type="text" autocomplete="family-name" required />
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" required />
+      </div>
+
+      <!-- FormSubmit control + context fields -->
+      <input type="hidden" id="f-opportunity" name="Opportunity" value="" />
+      <input type="hidden" id="f-organization" name="Organization" value="" />
+      <input type="hidden" name="_subject" value="New volunteer interest — Door County Volunteer Hub" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" id="f-autoresponse" name="_autoresponse" value="" />
+      <!-- honeypot: real people leave this empty -->
+      <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true" />
+
+      <p class="consent">
+        By submitting, you agree we can share your name and email with this
+        organization so they can follow up about volunteering.
+      </p>
+
+      <p id="form-status" class="form-status" role="status" aria-live="polite" hidden></p>
+
+      <menu class="dialog-actions">
+        <button type="button" id="interest-cancel" class="link-button">Cancel</button>
+        <button type="submit" id="interest-submit" class="primary">Send</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
+      <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · <a id="footer-email" href="mailto:cosmicbobsleigh@gmail.com">Contact</a></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

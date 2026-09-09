@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "lastUpdated": "2026-09-09",
+    "contactEmail": "cosmicbobsleigh@gmail.com",
+    "demoData": true,
+    "categories": [
+      "outdoors",
+      "animals",
+      "manual-labor",
+      "events",
+      "admin",
+      "driving",
+      "tabling",
+      "youth",
+      "food",
+      "fundraising"
+    ],
+    "commitmentTypes": ["one-time", "recurring", "flexible"]
+  },
+
+  "organizations": [
+    {
+      "id": "open-door-pride",
+      "name": "Open Door Pride",
+      "website": "https://www.opendoorpride.org",
+      "location": "Sturgeon Bay, WI",
+      "blurb": "LGBTQ+ advocacy, education, and community events across Door County.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "open-door-bird-sanctuary",
+      "name": "Open Door Bird Sanctuary",
+      "website": "https://www.opendoorbirdsanctuary.org",
+      "location": "Sawyer / Sturgeon Bay, WI",
+      "blurb": "Raptor sanctuary and nature center on 40 wooded acres.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "door-county-land-trust",
+      "name": "Door County Land Trust",
+      "website": "https://www.doorcountylandtrust.org",
+      "location": "Sturgeon Bay, WI",
+      "blurb": "Protects and cares for natural land and water across the peninsula.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "lakeshore-cap",
+      "name": "Lakeshore CAP",
+      "website": "https://www.lakeshorecap.org",
+      "location": "Serves Door County",
+      "blurb": "Community Action Program: housing, financial, and family support services.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "door-county-mutual-aid",
+      "name": "Door County Mutual Aid",
+      "website": "",
+      "location": "Door County, WI",
+      "blurb": "Neighbors helping neighbors with rides, supplies, and direct support.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "door-county-bookmobile",
+      "name": "Door County Bookmobile",
+      "website": "https://dclibrary.org",
+      "location": "Routes across Door County",
+      "blurb": "Brings library books and materials to communities without a branch nearby.",
+      "partnerStatus": "prospective"
+    }
+  ],
+
+  "opportunities": [
+    {
+      "id": "example-odbs-grounds-crew",
+      "orgId": "open-door-bird-sanctuary",
+      "title": "EXAMPLE — Grounds & trail crew",
+      "description": "Help rake, clear brush, and prep bird enclosures for winter. No experience needed; tools provided. Replace this entry with a real, verified opportunity before launch.",
+      "categories": ["outdoors", "manual-labor", "animals"],
+      "commitment": "one-time",
+      "schedule": "Saturday mornings, 9am-12pm",
+      "location": "On-site, Sawyer",
+      "minAge": 14,
+      "status": "open",
+      "verified": true,
+      "verifiedDate": "2026-09-09",
+      "postedDate": "2026-09-09",
+      "expiresDate": "2026-12-31",
+      "coordinator": "Sam"
+    },
+    {
+      "id": "example-land-trust-workday",
+      "orgId": "door-county-land-trust",
+      "title": "EXAMPLE — Preserve stewardship workday",
+      "description": "Invasive species removal and trail maintenance at a nature preserve. Dress for the weather. Replace this entry with a real, verified opportunity before launch.",
+      "categories": ["outdoors", "manual-labor"],
+      "commitment": "recurring",
+      "schedule": "Second Saturday of each month",
+      "location": "Rotating preserves",
+      "minAge": 16,
+      "status": "open",
+      "verified": true,
+      "verifiedDate": "2026-09-09",
+      "postedDate": "2026-09-09",
+      "expiresDate": "2026-12-31",
+      "coordinator": "Sam"
+    },
+    {
+      "id": "example-pride-event-table",
+      "orgId": "open-door-pride",
+      "title": "EXAMPLE — Event table volunteer",
+      "description": "Staff an info table at a community event: greet visitors, hand out materials, answer basic questions. Training provided. Replace this entry with a real, verified opportunity before launch.",
+      "categories": ["events", "tabling"],
+      "commitment": "one-time",
+      "schedule": "Various dates, 2-4 hour shifts",
+      "location": "Sturgeon Bay area",
+      "minAge": 18,
+      "status": "open",
+      "verified": true,
+      "verifiedDate": "2026-09-09",
+      "postedDate": "2026-09-09",
+      "expiresDate": "2026-12-31",
+      "coordinator": "Sam"
+    },
+    {
+      "id": "example-bookmobile-ride-along",
+      "orgId": "door-county-bookmobile",
+      "title": "EXAMPLE — Route assistant",
+      "description": "Ride along on the bookmobile route to help patrons find materials and check items in and out. Replace this entry with a real, verified opportunity before launch.",
+      "categories": ["driving", "admin", "youth"],
+      "commitment": "recurring",
+      "schedule": "Weekday afternoons",
+      "location": "Bookmobile routes",
+      "minAge": 18,
+      "status": "open",
+      "verified": true,
+      "verifiedDate": "2026-09-09",
+      "postedDate": "2026-09-09",
+      "expiresDate": "2026-12-31",
+      "coordinator": "Sam"
+    }
+  ]
+}
