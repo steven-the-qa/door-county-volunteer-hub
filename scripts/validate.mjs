@@ -47,7 +47,7 @@ else {
 
 // opportunities
 const oppIds = new Set();
-const REQUIRED = ["id", "orgId", "title", "description", "commitment", "status", "verified", "postedDate", "expiresDate"];
+const REQUIRED = ["id", "orgId", "title", "description", "commitment", "status", "verified", "postedDate"];
 if (!Array.isArray(data.opportunities)) err("opportunities: must be an array");
 else {
   data.opportunities.forEach((op, i) => {

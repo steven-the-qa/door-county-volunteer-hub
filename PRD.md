@@ -48,7 +48,7 @@ From the project brief:
 | # | Requirement (user story) | Acceptance criteria | Technical implementation |
 |---|---|---|---|
 | F1 | As a visitor I see a list of current opportunities grouped/attributed by org | Each card shows org name, title, short description, commitment type, location, "posted" date | Static page renders from `data/opportunities.json` via vanilla JS `fetch()` + template; no framework |
-| F2 | As a visitor I only ever see **active, verified** opportunities | Entries with `status != "open"` or `expiresDate < today` or `verified != true` are hidden automatically | Client-side filter at render time using the browser's current date |
+| F2 | As a visitor I only ever see **active, verified** opportunities | Entries hidden automatically when `status != "open"`, `verified != true`, or (if `expiresDate` is set) it is in the past | Client-side filter at render time using the browser's current date |
 | F3 | As a visitor I can narrow the list | Filter by category, commitment (one-time / recurring), and org; filters combine | Client-side filtering over the in-memory array; state in URL query string (`?org=&category=&commitment=`) — no PII in URL |
 | F4 | As a visitor I can express interest in a specific opportunity | Native `<dialog>` form asks First name, Last name, Email + hidden opportunity/org fields; inline success message shown | **FormSubmit (formsubmit.co)** AJAX **alias** endpoint — free, unlimited, no account. The inbox address is never in the site source; activation is done once via `curl` from a terminal, then the alias is pasted into `app.js`. `_honey` honeypot + client honeypot check. `fetch()` submit, no page navigation. No backend code |
 | F5 | Submissions reach the connectors immediately | Each submission emails the connectors with which opportunity it was for | FormSubmit notification (`_template: table`) → project inbox. Second-recipient redundancy is a Gmail auto-forward rule (not a `_cc` field — that would put a second address in the page source). Swap for a dedicated shared mailbox before wider launch |
@@ -139,7 +139,7 @@ separate (one org → many opportunities) — this is the org-to-opportunity map
 - `verified` / `verifiedDate` — set only after a connector confirms the need with the org directly.
 - `commitment` — `one-time` | `recurring` | `flexible`.
 - `categories` — free list from a small controlled vocabulary kept at top of the file in a comment or a `meta.categories` array.
-- `expiresDate` — required; entries auto-hide after this date so stale listings can't linger.
+- `expiresDate` — optional. If set, the entry auto-hides after this date (use it for one-time or time-boxed opportunities). Omit it for ongoing roles and retire them by hand (`status`).
 
 ### Validation (lightweight)
 - `data/opportunities.schema.json` (reference) + `scripts/validate.mjs` — a dependency-free Node script run by the deploy workflow. Fails the deploy on: invalid JSON, unknown `orgId`, duplicate `id`, missing required fields, bad enum values, or bad date format. Warns (does not fail) on an `open`+`verified` entry whose `expiresDate` is already past.

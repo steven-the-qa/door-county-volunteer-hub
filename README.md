@@ -11,7 +11,7 @@ See [PRD.md](PRD.md) for the full product/technical spec.
 - `data/opportunities.json` holds organizations and their opportunities.
 - `app.js` fetches that file and renders the list in the browser, with filters.
 - Only opportunities that are `status: "open"`, `verified: true`, and not past
-  their `expiresDate` are shown.
+  their `expiresDate` (when one is set) are shown.
 - The "Express interest" form posts to [FormSubmit](https://formsubmit.co)
   (free, no account), which emails the connectors and auto-replies to the volunteer.
 
@@ -61,13 +61,15 @@ Rules:
 - `id` / `orgId`: lowercase, digits, hyphens only. Never reuse an `id`.
 - `status`: `open` shows; `filled` / `paused` / `closed` / `draft` hide.
 - `verified`: only `true` after a connector confirms the need with the org.
-- `expiresDate`: required. The listing auto-hides after this date.
+- `expiresDate`: **optional**. Set it for one-time or time-boxed opportunities and
+  the listing auto-hides after that date. Omit it for ongoing roles.
 - `categories`: keep to the list in `meta.categories` (the validator warns otherwise).
 
 ### Retiring an opportunity
 
-Set `"status": "closed"` (or `"filled"`), or just let `expiresDate` pass.
-Keep the entry for a while for reference; delete old ones periodically.
+Set `"status": "closed"` (or `"filled"`). Time-boxed entries also drop off on
+their own once `expiresDate` passes. Keep old entries around for reference for a
+while, then delete them.
 
 ## One-time setup
 
