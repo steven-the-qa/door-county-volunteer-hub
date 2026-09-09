@@ -82,9 +82,10 @@ terminal instead:
    header and `-F` (multipart) are both required — `-d` gets rejected:
    ```bash
    curl -s -X POST https://formsubmit.co/ajax/<inbox-address> \
-     -H "Origin: https://steven-the-qa.github.io" \
+     -H "Origin: https://docovolunteerhub.com" \
      -F "activate=1" -F "email=<inbox-address>"
    ```
+   (Already done for this project — alias is wired into `app.js`.)
 2. FormSubmit emails that inbox an "Activate Form" link **and** a permanent
    random alias URL. Click the link; copy the random alias string.
 3. In `app.js`, set:
@@ -110,10 +111,18 @@ privacy/deletion requests — that is deliberate.
 1. Push this repo to GitHub.
 2. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 3. Push to `main`. The `deploy.yml` workflow validates the JSON and publishes.
-4. Site URL: `https://<user>.github.io/door-county-volunteer-hub/`.
+4. Default URL: `https://steven-the-qa.github.io/door-county-volunteer-hub/`.
 
-A custom domain can be added later under Settings → Pages without other changes
-(all links and asset paths in this repo are relative).
+### Custom domain
+
+Live at **https://docovolunteerhub.com** (registered via Squarespace).
+
+- Squarespace DNS: apex `@` has four `A` records → `185.199.108.153` /
+  `.109.153` / `.110.153` / `.111.153`; `www` is a `CNAME` → `steven-the-qa.github.io`.
+- Repo **Settings → Pages → Custom domain** = `docovolunteerhub.com`; the `CNAME`
+  file in this repo matches it.
+- "Enforce HTTPS" is on once GitHub finishes issuing the cert.
+- All links and asset paths in this repo are relative, so nothing else changed.
 
 ## Local preview
 

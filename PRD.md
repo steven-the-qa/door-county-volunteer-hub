@@ -162,8 +162,8 @@ Editing:  Connector ──git push main──> GitHub Actions (validate JSON) �
 ```
 
 - **No server, no build step required.** A build step (static pre-render from JSON for SEO) is optional and can be added later without changing the data model.
-- **Hosting (MVP):** GitHub Pages, published by a GitHub Actions workflow (`.github/workflows/deploy.yml`) that first runs `node scripts/validate.mjs` and only deploys if the data file is valid. Set repo **Settings → Pages → Source: GitHub Actions**.
-- **Custom domain:** added later under Settings → Pages with no code changes — all links and asset paths are relative.
+- **Hosting (MVP):** GitHub Pages, published by a GitHub Actions workflow (`.github/workflows/deploy.yml`) that first runs `node scripts/validate.mjs` and only deploys if the data file is valid. Pages source = GitHub Actions.
+- **Custom domain:** `docovolunteerhub.com` (registered via Squarespace; apex `A` records → GitHub Pages IPs, `www` CNAME → `steven-the-qa.github.io`, `CNAME` file in repo). No code changes — all links and asset paths are relative.
 - **Repo:** single public GitHub repo (`steven-the-qa/door-county-volunteer-hub`). Opportunity edits via direct commit to `main` or PR.
 
 ## 8. Content / operations workflow
