@@ -12,7 +12,7 @@
   //   curl -X POST https://formsubmit.co/ajax/<inbox-address> -d "activate=1"
   // FormSubmit emails the inbox an activation link + the permanent alias. Click the
   // link, then paste the alias below. Until then the form shows an "unavailable" note.
-  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/REPLACE_WITH_FORMSUBMIT_ALIAS";
+  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/fbb5736bac7b9face1c6a86c6b737d9b";
 
   var DATA_URL = "data/opportunities.json";
 
