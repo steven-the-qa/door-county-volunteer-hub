@@ -76,12 +76,15 @@ Keep the entry for a while for reference; delete old ones periodically.
 The inbox address is **not** in the site source. Activate FormSubmit from a
 terminal instead:
 
-1. Run (once), replacing `<inbox-address>` with the project inbox:
+1. Run (once), replacing `<inbox-address>` with the project inbox. The `Origin`
+   header and `-F` (multipart) are both required — `-d` gets rejected:
    ```bash
-   curl -X POST https://formsubmit.co/ajax/<inbox-address> -d "activate=1"
+   curl -s -X POST https://formsubmit.co/ajax/<inbox-address> \
+     -H "Origin: https://steven-the-qa.github.io" \
+     -F "activate=1" -F "email=<inbox-address>"
    ```
-2. FormSubmit emails that inbox an activation link **and** a permanent random
-   alias. Click the activation link.
+2. FormSubmit emails that inbox an "Activate Form" link **and** a permanent
+   random alias URL. Click the link; copy the random alias string.
 3. In `app.js`, set:
    ```js
    var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/<your-alias>";
