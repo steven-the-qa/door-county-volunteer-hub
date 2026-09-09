@@ -17,7 +17,9 @@ See [PRD.md](PRD.md) for the full product/technical spec.
 
 ```
 index.html · about.html · privacy.html   static pages
-styles.css · app.js                      one stylesheet, one script
+app.js                                   one script (no framework, no build)
+styles.css                               EMPTY placeholder — visual design pending;
+                                         class hooks are documented at the top of the file
 data/opportunities.json                  the only file you edit day-to-day
 data/opportunities.schema.json            reference schema
 scripts/validate.mjs                      node, no dependencies

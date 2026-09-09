@@ -240,12 +240,18 @@
     })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { ok: r.ok, body: b }; }); })
       .then(function (res) {
-        if (res.ok) {
+        var succeeded = res.ok && String((res.body && res.body.success) || "true") === "true";
+        if (succeeded) {
           showStatus("ok",
             "Thanks! We've got it. Sam will email you within about 2 business days. " +
             "Check your inbox for a confirmation.");
           form.querySelectorAll("input:not([type=hidden])").forEach(function (i) { i.disabled = true; });
           cancelBtn.textContent = "Close";
+        } else if (res.body && /activat/i.test(res.body.message || "")) {
+          showStatus("error",
+            "Form service needs activation — check the cosmicbobsleigh@gmail.com inbox " +
+            "for a FormSubmit confirmation email, then try again.");
+          submitBtn.disabled = false;
         } else {
           showStatus("error",
             "Something went wrong sending that. Please email us directly at " + state.contactEmail + ".");

@@ -55,7 +55,7 @@ From the project brief:
 | F6 | As a visitor I understand what happens next | (a) On-page: inline confirmation replacing the form ("we've got it, Sam will email you within ~2 business days"). (b) Email: the volunteer gets an auto-reply naming the specific org | Inline status `<p role="status">` on `fetch` success; FormSubmit `_autoresponse` hidden field (free) whose value is built per-opportunity at render time. See copy in §5.1 |
 | F7 | As a connector I can add/edit/expire an opportunity in minutes | Edit one JSON file, commit to `main`, site updates within a few minutes | Git repo + GitHub Actions → GitHub Pages auto-deploy on push (validates JSON first) |
 | F8 | As a connector I can show a nonprofit "here's your listing" | Stable per-opportunity URL (anchor) and per-org section | `#<opportunityId>` anchors; `?org=<orgId>` deep link |
-| F9 | The site works on a phone and is accessible | Responsive layout; passes basic a11y (labels, contrast, keyboard, semantic headings) | System-font CSS, flex/grid, `<label>` on every field, single `<h1>`, visible focus states |
+| F9 | The site works on a phone and is accessible | Responsive layout; passes basic a11y (labels, contrast, keyboard, semantic headings) | Semantic HTML with a documented set of class hooks. **Visual design is deferred** — `styles.css` is currently an empty placeholder (keeps only the honeypot-hiding rule) pending a design pass. HTML already has `<label>` on every field, one `<h1>` per page, skip link, and `role="status"` live regions |
 | F10 | A visitor can find the "about / how this works" and privacy info | Static About page + Privacy page reachable from every page | Two more static HTML files or sections. About page = short "how this works" blurb + brief profiles of **Sam** and **Steven** (bio copy TBD — placeholder blocks to fill in manually later) |
 | F11 | If JS fails or JSON can't load, the visitor isn't stranded | Fallback message with the shared inbox address / contact link | `<noscript>` block + `catch` on the fetch that renders a mailto fallback |
 
@@ -208,7 +208,7 @@ Editing:  Connector ──git push main──> GitHub Actions (validate JSON) �
 | Milestone | Contents |
 |---|---|
 | **M0 — Scaffold** ✅ | Repo, `opportunities.json` + schema + validator, README, PRD |
-| **M1 — Site** ✅ | `index.html` + `app.js` render cards from JSON, filters + URL sync, responsive, a11y, JSON-load fallback, `<noscript>` |
+| **M1 — Site** ✅ logic / ⬜ design | `index.html` + `app.js` render cards from JSON, filters + URL sync, JSON-load fallback, `<noscript>`. Visual design (`styles.css`) deferred to a separate design pass |
 | **M2 — Form** ✅ built / ⬜ activate | Form built (dialog, `_honey`, `_cc`, `_template`, per-opportunity `_autoresponse` + `_subject`, inline confirmation). Remaining manual steps: submit once to activate FormSubmit, paste the alias into `app.js`, set the Gmail label/star filter |
 | **M3 — Ship** ✅ built / ⬜ enable | About + Privacy pages done; `deploy.yml` validates + publishes to Pages. Remaining: push to GitHub, set Pages source to "GitHub Actions" |
 | **M4 — Onboard** ⬜ | Replace EXAMPLE entries with confirmed, verified opportunities from 3+ orgs; soft launch; then marketing (Pulse/Knock ads, Mutual Aid, flyers, social) |
