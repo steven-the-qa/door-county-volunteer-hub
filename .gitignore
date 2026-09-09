@@ -3,3 +3,7 @@ node_modules/
 *.log
 .vscode/
 .idea/
+
+# Cloudflare Worker
+worker/.dev.vars
+worker/.wrangler/

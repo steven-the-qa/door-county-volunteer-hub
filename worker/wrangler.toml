@@ -1,0 +1,10 @@
+name = "dcvh-form"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Secret (not stored here) — set once with:
+#   npx wrangler secret put RESEND_API_KEY
+#
+# Deployed URL after `npx wrangler deploy`:
+#   https://dcvh-form.<your-workers-subdomain>.workers.dev
+# Put that URL in ../app.js as WORKER_ENDPOINT.
