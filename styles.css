@@ -1,36 +1,287 @@
-/* Door County Volunteer Hub — styles intentionally left blank.
-   Design is being done separately. The HTML uses these hooks:
+/* Door County Volunteer Hub - basic styles. */
 
-   Layout / structure
-     .wrap                 centered content column
-     .site-header .brand / nav
-     .site-footer
-     .skip-link            keyboard skip-to-content link (keep it visually
-                           hidden until :focus for accessibility)
+body {
+  font-family: Verdana, Geneva, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #222222;
+  background-color: #f2f2f2;
+  margin: 0;
+}
 
-   Home page
-     .intro .lede
-     #demo-banner.banner   shown only when data has meta.demoData
-     .filters .field       filter dropdowns
-     .result-count
-     .cards > .card        one opportunity per card
-       .card h2 / .org / .desc / dl (dt/dd) / .tags > .tag
-     .primary              "Express interest" button
-     #empty-state / #load-error / .empty
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
-   Interest dialog
-     dialog#interest-dialog
-     #interest-form .field / .dialog-context / .consent
-     .form-status(.ok / .error)   live region
-     .dialog-actions
-     .honeypot             MUST stay visually hidden (spam trap) — see rule below
-     .link-button
+a {
+  color: #1a5276;
+}
 
-   Content pages (about.html, privacy.html)
-     .prose
-     .bios > .bio > .bio-role
+h1 {
+  font-size: 26px;
+  margin: 20px 0 10px 0;
+}
 
-   Respects prefers-color-scheme if you want light/dark. */
+h2 {
+  font-size: 19px;
+  margin: 0 0 6px 0;
+}
+
+/* Skip link - hidden until focused */
+.skip-link {
+  position: absolute;
+  left: -1000px;
+}
+.skip-link:focus {
+  position: static;
+  display: inline-block;
+  margin: 8px;
+}
+
+/* Header and footer */
+.site-header {
+  background-color: #2e5339;
+  border-bottom: 3px solid #1f3a28;
+}
+.site-header .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.brand {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 17px;
+  text-decoration: none;
+}
+.site-header nav a {
+  color: #ffffff;
+  margin-left: 14px;
+}
+
+.site-footer {
+  margin-top: 40px;
+  border-top: 1px solid #cccccc;
+  background-color: #e8e8e8;
+  font-size: 13px;
+  color: #555555;
+}
+.site-footer .wrap {
+  padding-top: 14px;
+  padding-bottom: 18px;
+}
+
+/* Intro */
+.lede {
+  color: #444444;
+}
+.banner {
+  background-color: #fff8e1;
+  border: 1px solid #e0c97f;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+/* Filters */
+.filters {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+.field {
+  display: inline-block;
+  margin-right: 14px;
+  margin-bottom: 6px;
+}
+.field label {
+  display: block;
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+select,
+input[type="text"],
+input[type="email"] {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 4px;
+  border: 1px solid #999999;
+  background-color: #ffffff;
+}
+.link-button {
+  font-family: inherit;
+  font-size: 14px;
+  background: none;
+  border: none;
+  color: #1a5276;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.result-count {
+  font-size: 13px;
+  color: #555555;
+  margin: 12px 0 8px 0;
+}
+
+/* Opportunity cards */
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.card {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.card .org {
+  margin: 0 0 10px 0;
+  font-weight: bold;
+  color: #555555;
+}
+.card .desc {
+  margin: 0 0 12px 0;
+}
+.card dl {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+}
+.card dt {
+  font-weight: bold;
+  color: #555555;
+  float: left;
+  clear: left;
+  width: 110px;
+}
+.card dd {
+  margin: 0 0 2px 0;
+  padding-left: 120px;
+}
+.tags {
+  list-style: none;
+  margin: 0 0 12px 0;
+  padding: 0;
+}
+.tags .tag {
+  display: inline-block;
+  background-color: #eeeeee;
+  border: 1px solid #cccccc;
+  font-size: 12px;
+  padding: 1px 6px;
+  margin-right: 4px;
+}
+
+.primary {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #2e5339;
+  color: #ffffff;
+  border: 1px solid #1f3a28;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+.primary:hover {
+  background-color: #24422d;
+}
+
+.empty {
+  background-color: #ffffff;
+  border: 1px dashed #aaaaaa;
+  padding: 20px;
+  text-align: center;
+  color: #555555;
+}
+
+/* Interest dialog */
+dialog {
+  border: 2px solid #2e5339;
+  padding: 0;
+  max-width: 420px;
+  width: 90%;
+}
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+#interest-form {
+  padding: 18px;
+}
+#interest-form .field {
+  display: block;
+  margin-right: 0;
+  margin-bottom: 10px;
+}
+#interest-form input[type="text"],
+#interest-form input[type="email"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+.dialog-context {
+  color: #444444;
+  margin-top: 0;
+}
+.consent {
+  font-size: 12px;
+  color: #555555;
+}
+.form-status {
+  padding: 8px 10px;
+  margin: 10px 0;
+  border: 1px solid #cccccc;
+}
+.form-status.ok {
+  background-color: #e6f0e8;
+  border-color: #2e5339;
+}
+.form-status.error {
+  background-color: #fbe3e3;
+  border-color: #b33;
+}
+.dialog-actions {
+  margin: 10px 0 0 0;
+  padding: 0;
+  text-align: right;
+}
+.dialog-actions .link-button {
+  margin-right: 10px;
+}
+
+/* Content pages */
+.prose {
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  padding: 8px 20px 20px 20px;
+  margin-top: 20px;
+}
+.prose h2 {
+  font-size: 17px;
+  margin-top: 22px;
+}
+.bios {
+  margin: 12px 0;
+}
+.bio {
+  border: 1px solid #cccccc;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.bio h3 {
+  margin: 0 0 2px 0;
+}
+.bio-role {
+  font-size: 13px;
+  color: #555555;
+  margin: 0 0 6px 0;
+}
 
 /* Functional, not design: keep the spam-trap field away from real users. */
 .honeypot {
@@ -39,4 +290,25 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .field {
+    display: block;
+    margin-right: 0;
+  }
+  select,
+  input[type="text"],
+  input[type="email"] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .card dt {
+    float: none;
+    width: auto;
+  }
+  .card dd {
+    padding-left: 0;
+    margin-bottom: 8px;
+  }
 }
