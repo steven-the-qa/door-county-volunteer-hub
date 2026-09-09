@@ -1,8 +1,16 @@
 {
   "meta": {
     "lastUpdated": "2026-09-09",
-    "contactEmail": "cosmicbobsleigh@gmail.com",
     "demoData": true,
+    "note": "Everything below is TEST DATA. Replace the organizations and opportunities with real, verified entries before launch (PRD milestone M4).",
+    "plannedOrganizations": [
+      "Open Door Pride",
+      "Open Door Bird Sanctuary",
+      "Door County Land Trust",
+      "Lakeshore CAP",
+      "Door County Mutual Aid",
+      "Door County Bookmobile"
+    ],
     "categories": [
       "outdoors",
       "animals",
@@ -20,123 +28,99 @@
 
   "organizations": [
     {
-      "id": "open-door-pride",
-      "name": "Open Door Pride",
-      "website": "https://www.opendoorpride.org",
-      "location": "Sturgeon Bay, WI",
-      "blurb": "LGBTQ+ advocacy, education, and community events across Door County.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "open-door-bird-sanctuary",
-      "name": "Open Door Bird Sanctuary",
-      "website": "https://www.opendoorbirdsanctuary.org",
-      "location": "Sawyer / Sturgeon Bay, WI",
-      "blurb": "Raptor sanctuary and nature center on 40 wooded acres.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "door-county-land-trust",
-      "name": "Door County Land Trust",
-      "website": "https://www.doorcountylandtrust.org",
-      "location": "Sturgeon Bay, WI",
-      "blurb": "Protects and cares for natural land and water across the peninsula.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "lakeshore-cap",
-      "name": "Lakeshore CAP",
-      "website": "https://www.lakeshorecap.org",
-      "location": "Serves Door County",
-      "blurb": "Community Action Program: housing, financial, and family support services.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "door-county-mutual-aid",
-      "name": "Door County Mutual Aid",
+      "id": "test-org-one",
+      "name": "Test Organization One",
       "website": "",
-      "location": "Door County, WI",
-      "blurb": "Neighbors helping neighbors with rides, supplies, and direct support.",
+      "location": "Test location, Door County",
+      "blurb": "Test organization. Not real. Used only to demo the site.",
       "partnerStatus": "prospective"
     },
     {
-      "id": "door-county-bookmobile",
-      "name": "Door County Bookmobile",
-      "website": "https://dclibrary.org",
-      "location": "Routes across Door County",
-      "blurb": "Brings library books and materials to communities without a branch nearby.",
+      "id": "test-org-two",
+      "name": "Test Organization Two",
+      "website": "",
+      "location": "Test location, Door County",
+      "blurb": "Test organization. Not real. Used only to demo the site.",
+      "partnerStatus": "prospective"
+    },
+    {
+      "id": "test-org-three",
+      "name": "Test Organization Three",
+      "website": "",
+      "location": "Test location, Door County",
+      "blurb": "Test organization. Not real. Used only to demo the site.",
       "partnerStatus": "prospective"
     }
   ],
 
   "opportunities": [
     {
-      "id": "example-odbs-grounds-crew",
-      "orgId": "open-door-bird-sanctuary",
-      "title": "EXAMPLE — Grounds & trail crew",
-      "description": "Help rake, clear brush, and prep bird enclosures for winter. No experience needed; tools provided. Replace this entry with a real, verified opportunity before launch.",
-      "categories": ["outdoors", "manual-labor", "animals"],
-      "commitment": "one-time",
-      "schedule": "Saturday mornings, 9am-12pm",
-      "location": "On-site, Sawyer",
-      "minAge": 14,
-      "status": "open",
-      "verified": true,
-      "verifiedDate": "2026-09-09",
-      "postedDate": "2026-09-09",
-      "expiresDate": "2026-12-31",
-      "coordinator": "Sam"
-    },
-    {
-      "id": "example-land-trust-workday",
-      "orgId": "door-county-land-trust",
-      "title": "EXAMPLE — Preserve stewardship workday",
-      "description": "Invasive species removal and trail maintenance at a nature preserve. Dress for the weather. Replace this entry with a real, verified opportunity before launch.",
+      "id": "test-opportunity-one",
+      "orgId": "test-org-one",
+      "title": "TEST OPPORTUNITY 1 — not a real posting",
+      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
       "categories": ["outdoors", "manual-labor"],
-      "commitment": "recurring",
-      "schedule": "Second Saturday of each month",
-      "location": "Rotating preserves",
+      "commitment": "one-time",
+      "schedule": "Test schedule — Saturday mornings",
+      "location": "Test location",
       "minAge": 16,
       "status": "open",
       "verified": true,
       "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
       "expiresDate": "2026-12-31",
-      "coordinator": "Sam"
+      "coordinator": "Test"
     },
     {
-      "id": "example-pride-event-table",
-      "orgId": "open-door-pride",
-      "title": "EXAMPLE — Event table volunteer",
-      "description": "Staff an info table at a community event: greet visitors, hand out materials, answer basic questions. Training provided. Replace this entry with a real, verified opportunity before launch.",
+      "id": "test-opportunity-two",
+      "orgId": "test-org-two",
+      "title": "TEST OPPORTUNITY 2 — not a real posting",
+      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
       "categories": ["events", "tabling"],
-      "commitment": "one-time",
-      "schedule": "Various dates, 2-4 hour shifts",
-      "location": "Sturgeon Bay area",
+      "commitment": "recurring",
+      "schedule": "Test schedule — monthly",
+      "location": "Test location",
       "minAge": 18,
       "status": "open",
       "verified": true,
       "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
       "expiresDate": "2026-12-31",
-      "coordinator": "Sam"
+      "coordinator": "Test"
     },
     {
-      "id": "example-bookmobile-ride-along",
-      "orgId": "door-county-bookmobile",
-      "title": "EXAMPLE — Route assistant",
-      "description": "Ride along on the bookmobile route to help patrons find materials and check items in and out. Replace this entry with a real, verified opportunity before launch.",
-      "categories": ["driving", "admin", "youth"],
+      "id": "test-opportunity-three",
+      "orgId": "test-org-two",
+      "title": "TEST OPPORTUNITY 3 — not a real posting",
+      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
+      "categories": ["admin", "youth"],
+      "commitment": "flexible",
+      "schedule": "Test schedule — flexible hours",
+      "location": "Test location",
+      "minAge": 0,
+      "status": "open",
+      "verified": true,
+      "verifiedDate": "2026-09-09",
+      "postedDate": "2026-09-09",
+      "expiresDate": "2026-12-31",
+      "coordinator": "Test"
+    },
+    {
+      "id": "test-opportunity-four",
+      "orgId": "test-org-three",
+      "title": "TEST OPPORTUNITY 4 — not a real posting",
+      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
+      "categories": ["driving", "food"],
       "commitment": "recurring",
-      "schedule": "Weekday afternoons",
-      "location": "Bookmobile routes",
+      "schedule": "Test schedule — weekday afternoons",
+      "location": "Test location",
       "minAge": 18,
       "status": "open",
       "verified": true,
       "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
       "expiresDate": "2026-12-31",
-      "coordinator": "Sam"
+      "coordinator": "Test"
     }
   ]
 }

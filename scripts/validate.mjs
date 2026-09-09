@@ -26,8 +26,6 @@ try {
 if (!data.meta || typeof data.meta !== "object") err("meta: missing or not an object");
 else {
   if (!isDate(data.meta.lastUpdated)) err("meta.lastUpdated: must be YYYY-MM-DD");
-  if (typeof data.meta.contactEmail !== "string" || !data.meta.contactEmail.includes("@"))
-    err("meta.contactEmail: must be an email address");
 }
 
 const VALID_CATEGORIES = Array.isArray(data.meta?.categories) ? new Set(data.meta.categories) : null;

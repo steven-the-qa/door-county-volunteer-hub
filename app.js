@@ -5,13 +5,14 @@
   "use strict";
 
   // --- Config -------------------------------------------------------------
-  // ACTIVATION (one time): this is the raw-address endpoint. Submit the form once
-  // (locally or on the live site) — FormSubmit emails cosmicbobsleigh@gmail.com an
-  // activation link plus a permanent random alias. Click the link, then replace the
-  // line below with the alias endpoint, e.g.
+  // Set this to the FormSubmit AJAX ALIAS endpoint, e.g.
   //   "https://formsubmit.co/ajax/a1b2c3d4e5f6..."
-  // The alias keeps the inbox address out of the page source, so don't skip that swap.
-  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/cosmicbobsleigh@gmail.com";
+  // To get the alias without ever putting the inbox address in this file, run once
+  // from a terminal:
+  //   curl -X POST https://formsubmit.co/ajax/<inbox-address> -d "activate=1"
+  // FormSubmit emails the inbox an activation link + the permanent alias. Click the
+  // link, then paste the alias below. Until then the form shows an "unavailable" note.
+  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/REPLACE_WITH_FORMSUBMIT_ALIAS";
 
   var DATA_URL = "data/opportunities.json";
 
@@ -43,7 +44,7 @@
   var submitBtn = document.getElementById("interest-submit");
   var cancelBtn = document.getElementById("interest-cancel");
 
-  var state = { orgs: {}, opportunities: [], contactEmail: "cosmicbobsleigh@gmail.com" };
+  var state = { orgs: {}, opportunities: [] };
 
   // --- Helpers ---------------------------------------------------------
   function todayISO() {
@@ -72,14 +73,6 @@
     return node;
   }
 
-  function setContactEmail(email) {
-    ["error-email", "footer-email", "org-email"].forEach(function (id) {
-      var a = document.getElementById(id);
-      if (a) { a.href = "mailto:" + email; }
-    });
-    var errText = document.getElementById("error-email");
-    if (errText) errText.textContent = email;
-  }
 
   // --- URL <-> filter sync -------------------------------------------
   function readFiltersFromURL() {
@@ -197,8 +190,7 @@
       "Thanks for your interest in volunteering with " + org.name +
       " through the Door County Volunteer Hub. We've received your message.\n\n" +
       "Sam will email you within about 2 business days to connect you with the right " +
-      "person at " + org.name + ". If you don't hear back by then, just reply to this " +
-      "email or write to " + state.contactEmail + ".\n\n" +
+      "person at " + org.name + ". If you don't hear back by then, just reply to this email.\n\n" +
       "— Sam & Steven, Door County Volunteer Hub";
 
     if (typeof dialog.showModal === "function") {
@@ -226,7 +218,7 @@
     if (form._honey && form._honey.value) return; // bot
     if (FORMSUBMIT_ENDPOINT.indexOf("REPLACE_WITH_FORMSUBMIT_ALIAS") !== -1) {
       showStatus("error",
-        "The interest form isn't connected yet. Please email us at " + state.contactEmail + ".");
+        "The interest form isn't available yet — please check back soon.");
       return;
     }
 
@@ -249,18 +241,18 @@
           cancelBtn.textContent = "Close";
         } else if (res.body && /activat/i.test(res.body.message || "")) {
           showStatus("error",
-            "Form service needs activation — check the cosmicbobsleigh@gmail.com inbox " +
-            "for a FormSubmit confirmation email, then try again.");
+            "The form service still needs activation. Check the project inbox for a " +
+            "FormSubmit confirmation email, then try again.");
           submitBtn.disabled = false;
         } else {
           showStatus("error",
-            "Something went wrong sending that. Please email us directly at " + state.contactEmail + ".");
+            "Something went wrong sending that. Please try again in a little while.");
           submitBtn.disabled = false;
         }
       })
       .catch(function () {
         showStatus("error",
-          "Couldn't reach the form service. Please email us at " + state.contactEmail + ".");
+          "Couldn't reach the form service. Please try again in a little while.");
         submitBtn.disabled = false;
       });
   }
@@ -270,9 +262,6 @@
     (data.organizations || []).forEach(function (o) { state.orgs[o.id] = o; });
     state.opportunities = (data.opportunities || []).filter(isLive)
       .sort(function (a, b) { return (b.postedDate || "").localeCompare(a.postedDate || ""); });
-
-    if (data.meta && data.meta.contactEmail) state.contactEmail = data.meta.contactEmail;
-    setContactEmail(state.contactEmail);
 
     if (data.meta && data.meta.demoData) demoBanner.hidden = false;
 

@@ -7,12 +7,13 @@
   "properties": {
     "meta": {
       "type": "object",
-      "required": ["lastUpdated", "contactEmail"],
+      "required": ["lastUpdated"],
       "additionalProperties": true,
       "properties": {
         "lastUpdated": { "type": "string", "format": "date" },
-        "contactEmail": { "type": "string" },
         "demoData": { "type": "boolean" },
+        "note": { "type": "string" },
+        "plannedOrganizations": { "type": "array", "items": { "type": "string" } },
         "categories": { "type": "array", "items": { "type": "string" } },
         "commitmentTypes": { "type": "array", "items": { "type": "string" } }
       }

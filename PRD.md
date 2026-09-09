@@ -50,14 +50,14 @@ From the project brief:
 | F1 | As a visitor I see a list of current opportunities grouped/attributed by org | Each card shows org name, title, short description, commitment type, location, "posted" date | Static page renders from `data/opportunities.json` via vanilla JS `fetch()` + template; no framework |
 | F2 | As a visitor I only ever see **active, verified** opportunities | Entries with `status != "open"` or `expiresDate < today` or `verified != true` are hidden automatically | Client-side filter at render time using the browser's current date |
 | F3 | As a visitor I can narrow the list | Filter by category, commitment (one-time / recurring), and org; filters combine | Client-side filtering over the in-memory array; state in URL query string (`?org=&category=&commitment=`) — no PII in URL |
-| F4 | As a visitor I can express interest in a specific opportunity | Native `<dialog>` form asks First name, Last name, Email + hidden opportunity/org fields; inline success message shown | **FormSubmit (formsubmit.co)** AJAX endpoint — free, unlimited submissions, no account. Use the random alias endpoint (not the raw email) so the address isn't in page source. `_honey` honeypot + client honeypot check. `fetch()` submit, no page navigation. No backend code. One-time activation on first submission |
-| F5 | Submissions reach the connectors immediately | Each submission emails the connectors with which opportunity it was for | FormSubmit notification (`_template: table`) → **cosmicbobsleigh@gmail.com** with **`_cc` = boutchersj@gmail.com**. Swap for a dedicated shared mailbox before wider launch |
+| F4 | As a visitor I can express interest in a specific opportunity | Native `<dialog>` form asks First name, Last name, Email + hidden opportunity/org fields; inline success message shown | **FormSubmit (formsubmit.co)** AJAX **alias** endpoint — free, unlimited, no account. The inbox address is never in the site source; activation is done once via `curl` from a terminal, then the alias is pasted into `app.js`. `_honey` honeypot + client honeypot check. `fetch()` submit, no page navigation. No backend code |
+| F5 | Submissions reach the connectors immediately | Each submission emails the connectors with which opportunity it was for | FormSubmit notification (`_template: table`) → project inbox. Second-recipient redundancy is a Gmail auto-forward rule (not a `_cc` field — that would put a second address in the page source). Swap for a dedicated shared mailbox before wider launch |
 | F6 | As a visitor I understand what happens next | (a) On-page: inline confirmation replacing the form ("we've got it, Sam will email you within ~2 business days"). (b) Email: the volunteer gets an auto-reply naming the specific org | Inline status `<p role="status">` on `fetch` success; FormSubmit `_autoresponse` hidden field (free) whose value is built per-opportunity at render time. See copy in §5.1 |
 | F7 | As a connector I can add/edit/expire an opportunity in minutes | Edit one JSON file, commit to `main`, site updates within a few minutes | Git repo + GitHub Actions → GitHub Pages auto-deploy on push (validates JSON first) |
 | F8 | As a connector I can show a nonprofit "here's your listing" | Stable per-opportunity URL (anchor) and per-org section | `#<opportunityId>` anchors; `?org=<orgId>` deep link |
 | F9 | The site works on a phone and is accessible | Responsive layout; passes basic a11y (labels, contrast, keyboard, semantic headings) | Semantic HTML with a documented set of class hooks. **Visual design is deferred** — `styles.css` is currently an empty placeholder (keeps only the honeypot-hiding rule) pending a design pass. HTML already has `<label>` on every field, one `<h1>` per page, skip link, and `role="status"` live regions |
 | F10 | A visitor can find the "about / how this works" and privacy info | Static About page + Privacy page reachable from every page | Two more static HTML files or sections. About page = short "how this works" blurb + brief profiles of **Sam** and **Steven** (bio copy TBD — placeholder blocks to fill in manually later) |
-| F11 | If JS fails or JSON can't load, the visitor isn't stranded | Fallback message with the shared inbox address / contact link | `<noscript>` block + `catch` on the fetch that renders a mailto fallback |
+| F11 | If JS fails or JSON can't load, the visitor isn't stranded | Neutral fallback message ("refresh / check back soon"); no address exposed here | `<noscript>` block + `catch` on the fetch that shows a plain retry message |
 
 ### 5.1 Auto-response copy (F6)
 
@@ -69,8 +69,7 @@ is generated from the JSON, so inject the org name into a per-opportunity
 > Volunteer Hub. We've received your message.
 >
 > Sam will email you within about 2 business days to connect you with the right person
-> at {org name}. If you don't hear back by then, just reply to this email or write to
-> cosmicbobsleigh@gmail.com.
+> at {org name}. If you don't hear back by then, just reply to this email.
 >
 > — Sam & Steven, Door County Volunteer Hub
 
@@ -100,7 +99,7 @@ separate (one org → many opportunities) — this is the org-to-opportunity map
 {
   "meta": {
     "lastUpdated": "2026-09-09",
-    "contactEmail": "cosmicbobsleigh@gmail.com"
+    "demoData": true
   },
   "organizations": [
     {
@@ -155,9 +154,9 @@ Browser ──GET──> GitHub Pages (CDN)
                    ├── data/opportunities.json
                    └── data/opportunities.schema.json
 
-Form submit ──fetch/POST──> FormSubmit (ajax) ──email──> cosmicbobsleigh@gmail.com
-                                              └─ _cc ──> boutchersj@gmail.com
-                                              └─ _autoresponse ──> volunteer
+Form submit ──fetch/POST──> FormSubmit (ajax alias) ──email──> project inbox
+                                                   └─ _autoresponse ──> volunteer
+                                    (Gmail rule) project inbox ──forward──> 2nd address
 
 Editing:  Connector ──git push main──> GitHub Actions (validate JSON) ──> deploy to Pages
 ```
@@ -211,12 +210,12 @@ Editing:  Connector ──git push main──> GitHub Actions (validate JSON) �
 | **M1 — Site** ✅ logic / ⬜ design | `index.html` + `app.js` render cards from JSON, filters + URL sync, JSON-load fallback, `<noscript>`. Visual design (`styles.css`) deferred to a separate design pass |
 | **M2 — Form** ✅ built / ⬜ activate | Form built (dialog, `_honey`, `_cc`, `_template`, per-opportunity `_autoresponse` + `_subject`, inline confirmation). Remaining manual steps: submit once to activate FormSubmit, paste the alias into `app.js`, set the Gmail label/star filter |
 | **M3 — Ship** ✅ built / ⬜ enable | About + Privacy pages done; `deploy.yml` validates + publishes to Pages. Remaining: push to GitHub, set Pages source to "GitHub Actions" |
-| **M4 — Onboard** ⬜ | Replace EXAMPLE entries with confirmed, verified opportunities from 3+ orgs; soft launch; then marketing (Pulse/Knock ads, Mutual Aid, flyers, social) |
+| **M4 — Onboard** ⬜ | Replace the TEST orgs/opportunities with confirmed, verified real ones from 3+ orgs; soft launch; then marketing (Pulse/Knock ads, Mutual Aid, flyers, social) |
 
 ## 13. Risks / open questions
 
 - **Form provider limits** — FormSubmit is free with unlimited submissions and no account. No usage cap to worry about for MVP.
-- **No stored submission log** — FormSubmit is a pure email relay and does not archive submissions. If Gmail drops or spam-files one, there's no record. Mitigate: `_cc` to boutchersj@gmail.com + a Gmail filter that labels/stars incoming submissions so they can't get buried.
+- **No stored submission log** — FormSubmit is a pure email relay and does not archive submissions. If Gmail drops or spam-files one, there's no record. Mitigate: a Gmail auto-forward from the project inbox to a second address + a filter that labels/stars incoming submissions so they can't get buried. (Not `_cc` — that would put a second address in the page source.)
 - **Form vendor longevity** — FormSubmit is a small free service with no SLA or support. If it changes terms or goes down, the form silently stops working. Endpoint swap is a ~10-minute change (just an action URL + field names). Do a monthly test submission to confirm it still delivers.
 - **Domain & shared inbox** — interim inbox is `cosmicbobsleigh@gmail.com`. Before wider launch, register a domain and stand up a dedicated shared mailbox (Google Workspace ~$6/mo, or a shared Gmail) so both connectors have equal access and the address survives a personal-account change.
 - **"Verified" trust** — the product's value depends on listings being real and current; the weekly review is a hard commitment, not optional.

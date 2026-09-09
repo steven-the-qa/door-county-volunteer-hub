@@ -73,23 +73,32 @@ Keep the entry for a while for reference; delete old ones periodically.
 
 ### 1. Connect the interest form (FormSubmit)
 
-1. Deploy the site (below) so the form is live.
-2. Submit the form once with a real email. FormSubmit sends an activation email
-   to `cosmicbobsleigh@gmail.com` — click the link.
-3. That email contains a **random alias** endpoint. In `app.js`, set:
+The inbox address is **not** in the site source. Activate FormSubmit from a
+terminal instead:
+
+1. Run (once), replacing `<inbox-address>` with the project inbox:
+   ```bash
+   curl -X POST https://formsubmit.co/ajax/<inbox-address> -d "activate=1"
+   ```
+2. FormSubmit emails that inbox an activation link **and** a permanent random
+   alias. Click the activation link.
+3. In `app.js`, set:
    ```js
    var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/<your-alias>";
    ```
-   Using the alias (not the raw address) keeps the inbox out of the page source.
-4. Commit and push.
+   The alias keeps the address out of the page source. Commit and push.
 
-The form already sends `_cc` to `boutchersj@gmail.com`, a table-formatted email,
-and a plain-text auto-response to the volunteer. Until the alias is set, the form
-shows a "not connected yet — email us" message instead of submitting.
+Until the alias is set, the form shows an "isn't available yet" message instead
+of submitting. The form sends a table-formatted email and a plain-text
+auto-response to the volunteer.
 
-In Gmail, add a filter: from `formsubmit.co` (or containing the `_subject` text)
-→ never send to spam, apply a label, and star it. Nothing is stored on
-FormSubmit's side, so the email is the only record.
+**Redundancy:** FormSubmit stores nothing, so the email is the only record. In
+Gmail: (a) filter mail from `formsubmit.co` → never spam, label + star; (b) if a
+second person needs every lead, add a Gmail auto-forward from the project inbox
+to their address (keeps the second address off the site too).
+
+The address also appears once on the Privacy page as a contact for
+privacy/deletion requests — that is deliberate.
 
 ### 2. Host on GitHub Pages
 
