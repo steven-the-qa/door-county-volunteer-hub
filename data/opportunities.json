@@ -1,11 +1,8 @@
 {
   "meta": {
     "lastUpdated": "2026-09-09",
-    "demoData": true,
-    "note": "Everything below is TEST DATA. Replace the organizations and opportunities with real, verified entries before launch (PRD milestone M4).",
     "plannedOrganizations": [
       "Open Door Pride",
-      "Open Door Bird Sanctuary",
       "Door County Land Trust",
       "Lakeshore CAP",
       "Door County Mutual Aid",
@@ -28,99 +25,47 @@
 
   "organizations": [
     {
-      "id": "test-org-one",
-      "name": "Test Organization One",
-      "website": "",
-      "location": "Test location, Door County",
-      "blurb": "Test organization. Not real. Used only to demo the site.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "test-org-two",
-      "name": "Test Organization Two",
-      "website": "",
-      "location": "Test location, Door County",
-      "blurb": "Test organization. Not real. Used only to demo the site.",
-      "partnerStatus": "prospective"
-    },
-    {
-      "id": "test-org-three",
-      "name": "Test Organization Three",
-      "website": "",
-      "location": "Test location, Door County",
-      "blurb": "Test organization. Not real. Used only to demo the site.",
-      "partnerStatus": "prospective"
+      "id": "open-door-bird-sanctuary",
+      "name": "Open Door Bird Sanctuary",
+      "website": "https://www.opendoorbirdsanctuary.org",
+      "location": "Sawyer / Sturgeon Bay, WI",
+      "blurb": "Raptor sanctuary and nature center on 40 wooded acres above the lakeshore.",
+      "partnerStatus": "active"
     }
   ],
 
   "opportunities": [
     {
-      "id": "test-opportunity-one",
-      "orgId": "test-org-one",
-      "title": "TEST OPPORTUNITY 1 — not a real posting",
-      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
-      "categories": ["outdoors", "manual-labor"],
-      "commitment": "one-time",
-      "schedule": "Test schedule — Saturday mornings",
-      "location": "Test location",
-      "minAge": 16,
-      "status": "open",
-      "verified": true,
-      "verifiedDate": "2026-09-09",
-      "postedDate": "2026-09-09",
-      "expiresDate": "2026-12-31",
-      "coordinator": "Test"
-    },
-    {
-      "id": "test-opportunity-two",
-      "orgId": "test-org-two",
-      "title": "TEST OPPORTUNITY 2 — not a real posting",
-      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
-      "categories": ["events", "tabling"],
+      "id": "odbs-raptor-team",
+      "orgId": "open-door-bird-sanctuary",
+      "title": "Raptor Team volunteer",
+      "description": "Train to handle the sanctuary's birds of prey: work directly with the raptors and help keep their enclosures clean. Handlers get hands-on training before working with the birds.",
+      "categories": ["animals", "manual-labor"],
       "commitment": "recurring",
-      "schedule": "Test schedule — monthly",
-      "location": "Test location",
-      "minAge": 18,
+      "schedule": "At least once a week. Raptor nights are Mondays and Thursdays.",
+      "location": "On-site, Sawyer",
       "status": "open",
       "verified": true,
       "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
       "expiresDate": "2026-12-31",
-      "coordinator": "Test"
+      "coordinator": "Sam"
     },
     {
-      "id": "test-opportunity-three",
-      "orgId": "test-org-two",
-      "title": "TEST OPPORTUNITY 3 — not a real posting",
-      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
-      "categories": ["admin", "youth"],
+      "id": "odbs-education-team",
+      "orgId": "open-door-bird-sanctuary",
+      "title": "Education Team volunteer",
+      "description": "Help the public connect with the birds without handling them yourself. Work alongside the handlers at events, talk with visitors, and learn to teach people about the raptors.",
+      "categories": ["animals", "events", "tabling"],
       "commitment": "flexible",
-      "schedule": "Test schedule — flexible hours",
-      "location": "Test location",
-      "minAge": 0,
+      "schedule": "Variable — depends on which events are scheduled.",
+      "location": "On-site and at events",
       "status": "open",
       "verified": true,
       "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
       "expiresDate": "2026-12-31",
-      "coordinator": "Test"
-    },
-    {
-      "id": "test-opportunity-four",
-      "orgId": "test-org-three",
-      "title": "TEST OPPORTUNITY 4 — not a real posting",
-      "description": "This is test data for the Door County Volunteer Hub. It is not a real volunteer opportunity. Please do not respond to it. Replace this entry before launch.",
-      "categories": ["driving", "food"],
-      "commitment": "recurring",
-      "schedule": "Test schedule — weekday afternoons",
-      "location": "Test location",
-      "minAge": 18,
-      "status": "open",
-      "verified": true,
-      "verifiedDate": "2026-09-09",
-      "postedDate": "2026-09-09",
-      "expiresDate": "2026-12-31",
-      "coordinator": "Test"
+      "coordinator": "Sam"
     }
   ]
 }
