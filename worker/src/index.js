@@ -7,10 +7,21 @@
 
 import { teamNotificationEmail, volunteerConfirmationEmail } from "./emails.js";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://docovolunteerhub.com",
-  "https://www.docovolunteerhub.com",
+// Origin is allowed by hostname, so http/https during the HTTPS-cert rollout and
+// the github.io fallback all work without listing every scheme.
+const ALLOWED_HOSTS = new Set([
+  "docovolunteerhub.com",
+  "www.docovolunteerhub.com",
+  "steven-the-qa.github.io",
 ]);
+
+function originAllowed(origin) {
+  try {
+    return ALLOWED_HOSTS.has(new URL(origin).hostname);
+  } catch {
+    return false;
+  }
+}
 
 const FROM = "Door County Volunteer Hub <team@docovolunteerhub.com>";
 const TEAM_INBOX = "team@docovolunteerhub.com";
@@ -18,7 +29,7 @@ const TEAM_INBOX = "team@docovolunteerhub.com";
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
-    const originOk = ALLOWED_ORIGINS.has(origin);
+    const originOk = originAllowed(origin);
     const cors = {
       "Access-Control-Allow-Origin": originOk ? origin : "https://docovolunteerhub.com",
       "Access-Control-Allow-Methods": "POST, OPTIONS",

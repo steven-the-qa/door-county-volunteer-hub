@@ -84,26 +84,19 @@
 
       <div class="field">
         <label for="f-first">First name</label>
-        <input id="f-first" name="First Name" type="text" autocomplete="given-name" required />
+        <input id="f-first" name="firstName" type="text" autocomplete="given-name" required />
       </div>
       <div class="field">
         <label for="f-last">Last name</label>
-        <input id="f-last" name="Last Name" type="text" autocomplete="family-name" required />
+        <input id="f-last" name="lastName" type="text" autocomplete="family-name" required />
       </div>
       <div class="field">
         <label for="f-email">Email</label>
         <input id="f-email" name="email" type="email" autocomplete="email" required />
       </div>
 
-      <!-- FormSubmit control + context fields -->
-      <input type="hidden" id="f-opportunity" name="Opportunity" value="" />
-      <input type="hidden" id="f-organization" name="Organization" value="" />
-      <input type="hidden" name="_subject" value="New volunteer interest — Door County Volunteer Hub" />
-      <input type="hidden" name="_template" value="table" />
-      <input type="hidden" name="_captcha" value="false" />
-      <input type="hidden" id="f-autoresponse" name="_autoresponse" value="" />
       <!-- honeypot: real people leave this empty -->
-      <input type="text" name="_honey" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true" />
+      <input type="text" name="company" tabindex="-1" autocomplete="off" class="honeypot" aria-hidden="true" />
 
       <p class="consent">
         By submitting, you agree we can share your name and email with this

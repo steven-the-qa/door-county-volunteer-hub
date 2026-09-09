@@ -5,14 +5,8 @@
   "use strict";
 
   // --- Config -------------------------------------------------------------
-  // Set this to the FormSubmit AJAX ALIAS endpoint, e.g.
-  //   "https://formsubmit.co/ajax/a1b2c3d4e5f6..."
-  // To get the alias without ever putting the inbox address in this file, run once
-  // from a terminal:
-  //   curl -X POST https://formsubmit.co/ajax/<inbox-address> -d "activate=1"
-  // FormSubmit emails the inbox an activation link + the permanent alias. Click the
-  // link, then paste the alias below. Until then the form shows an "unavailable" note.
-  var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/fbb5736bac7b9face1c6a86c6b737d9b";
+  // Cloudflare Worker (repo: /worker) that sends the two branded emails via Resend.
+  var WORKER_ENDPOINT = "https://dcvh-form.docovolunteerhub.workers.dev";
 
   var DATA_URL = "data/opportunities.json";
 
@@ -37,14 +31,12 @@
   var form = document.getElementById("interest-form");
   var dialogOpportunity = document.getElementById("dialog-opportunity");
   var dialogOrg = document.getElementById("dialog-org");
-  var fOpportunity = document.getElementById("f-opportunity");
-  var fOrganization = document.getElementById("f-organization");
-  var fAutoresponse = document.getElementById("f-autoresponse");
   var formStatus = document.getElementById("form-status");
   var submitBtn = document.getElementById("interest-submit");
   var cancelBtn = document.getElementById("interest-cancel");
 
   var state = { orgs: {}, opportunities: [] };
+  var current = null; // { op, org } for the opportunity the dialog is open on
 
   // --- Helpers ---------------------------------------------------------
   function todayISO() {
@@ -181,17 +173,14 @@
     formStatus.hidden = true;
     formStatus.className = "form-status";
     submitBtn.disabled = false;
+    submitBtn.hidden = false;
+    submitBtn.textContent = "Send";
+    cancelBtn.textContent = "Cancel";
+    Array.prototype.forEach.call(form.querySelectorAll("input"), function (i) { i.disabled = false; });
 
+    current = { op: op, org: org };
     dialogOpportunity.textContent = op.title;
     dialogOrg.textContent = org.name;
-    fOpportunity.value = op.title + " (" + op.id + ")";
-    fOrganization.value = org.name;
-    fAutoresponse.value =
-      "Thanks for your interest in volunteering with " + org.name +
-      " through the Door County Volunteer Hub. We've received your message.\n\n" +
-      "Sam will email you within about 2 business days to connect you with the right " +
-      "person at " + org.name + ". If you don't hear back by then, just reply to this email.\n\n" +
-      "— Sam & Steven, Door County Volunteer Hub";
 
     if (typeof dialog.showModal === "function") {
       dialog.showModal();
@@ -214,36 +203,40 @@
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!current) return;
+    if (form.company && form.company.value) return; // honeypot — bot
 
-    if (form._honey && form._honey.value) return; // bot
-    if (FORMSUBMIT_ENDPOINT.indexOf("REPLACE_WITH_FORMSUBMIT_ALIAS") !== -1) {
-      showStatus("error",
-        "The interest form isn't available yet — please check back soon.");
-      return;
-    }
+    var payload = {
+      firstName: document.getElementById("f-first").value.trim(),
+      lastName: document.getElementById("f-last").value.trim(),
+      email: document.getElementById("f-email").value.trim(),
+      opportunityTitle: current.op.title,
+      opportunityId: current.op.id,
+      orgName: current.org.name,
+      company: form.company ? form.company.value : ""
+    };
 
     submitBtn.disabled = true;
     showStatus("ok", "Sending…");
 
-    fetch(FORMSUBMIT_ENDPOINT, {
+    fetch(WORKER_ENDPOINT, {
       method: "POST",
-      headers: { "Accept": "application/json" },
-      body: new FormData(form)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { ok: r.ok, body: b }; }); })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (b) {
+          return { httpOk: r.ok, body: b };
+        });
+      })
       .then(function (res) {
-        var succeeded = res.ok && String((res.body && res.body.success) || "true") === "true";
-        if (succeeded) {
+        if (res.httpOk && res.body && res.body.ok) {
           showStatus("ok",
-            "Thanks! We've got it. Sam will email you within about 2 business days. " +
-            "Check your inbox for a confirmation.");
-          form.querySelectorAll("input:not([type=hidden])").forEach(function (i) { i.disabled = true; });
+            "Thanks! Your interest is in. The Door County Volunteer Hub team will " +
+            "email you within about two business days — check your inbox for a confirmation.");
+          Array.prototype.forEach.call(form.querySelectorAll("input"), function (i) { i.disabled = true; });
+          submitBtn.hidden = true;
           cancelBtn.textContent = "Close";
-        } else if (res.body && /activat/i.test(res.body.message || "")) {
-          showStatus("error",
-            "The form service still needs activation. Check the project inbox for a " +
-            "FormSubmit confirmation email, then try again.");
-          submitBtn.disabled = false;
         } else {
           showStatus("error",
             "Something went wrong sending that. Please try again in a little while.");
@@ -252,7 +245,7 @@
       })
       .catch(function () {
         showStatus("error",
-          "Couldn't reach the form service. Please try again in a little while.");
+          "Couldn't reach the server. Please try again in a little while.");
         submitBtn.disabled = false;
       });
   }
