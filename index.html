@@ -120,6 +120,18 @@
     </div>
   </footer>
 
+  <script type="module">
+  // Loads the shared, tested logic (lib.js — see lib.test.mjs, run via
+  // `node --test`) as a real ES module, then exposes it on window so
+  // app.js (a plain script, not a module) can reach it. Safe regardless of
+  // load order here: app.js only ever calls into this from inside the
+  // fetch().then() callback once data/opportunities.json has loaded, never
+  // synchronously at parse time, and that's always later than this module
+  // finishes (module scripts always run deferred, after the document
+  // finishes parsing).
+  import { isLive } from "./lib.js";
+  window.DCVHSiteLib = { isLive };
+  </script>
   <script src="app.js"></script>
 </body>
 </html>

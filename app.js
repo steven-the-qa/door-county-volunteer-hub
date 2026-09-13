@@ -43,11 +43,12 @@
     return new Date().toISOString().slice(0, 10);
   }
 
+  // The actual open/verified/not-expired decision lives in lib.js (tested
+  // in lib.test.mjs, run via `node --test`) — this just calls into it with
+  // today's date, since that function takes "today" as a plain argument
+  // instead of reading the clock itself, to stay testable.
   function isLive(op) {
-    if (op.status !== "open") return false;
-    if (op.verified !== true) return false;
-    if (op.expiresDate && op.expiresDate < todayISO()) return false;
-    return true;
+    return window.DCVHSiteLib.isLive(op, todayISO());
   }
 
   function el(tag, props, children) {
