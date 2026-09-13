@@ -7,15 +7,24 @@
   <title>Door County Volunteer Hub — Content Admin</title>
 </head>
 <body>
-  <!--
-    Relays the OAuth login result from the popup to Decap CMS. Decap only
-    accepts that message from a window whose origin is exactly the
-    auth backend's base_url — a hidden iframe on that origin satisfies this
-    without ever depending on window.opener (which GitHub's OAuth page
-    breaks). See cms-auth/src/index.js for the full explanation.
-  -->
-  <iframe src="https://dcvh-cms-auth.docovolunteerhub.workers.dev/relay.html"
-          style="display:none" title="" aria-hidden="true"></iframe>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+  // Relays the OAuth login result from the popup to Decap CMS. Decap only
+  // accepts that message from a window whose origin is exactly the auth
+  // backend's base_url — a hidden iframe on that origin satisfies this
+  // without ever depending on window.opener (which GitHub's OAuth page
+  // breaks). See cms-auth/src/index.js for the full explanation.
+  //
+  // Added via script, and only after decap-cms.js above has already run —
+  // Decap takes over <body> on mount, so a static <iframe> declared before
+  // its script tag gets wiped before the browser ever loads it.
+  (function () {
+    var relay = document.createElement("iframe");
+    relay.src = "https://dcvh-cms-auth.docovolunteerhub.workers.dev/relay.html";
+    relay.style.display = "none";
+    relay.setAttribute("aria-hidden", "true");
+    document.body.appendChild(relay);
+  })();
+  </script>
 </body>
 </html>
