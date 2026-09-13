@@ -7,7 +7,7 @@ compatibility_date = "2024-11-01"
 #   npx wrangler kv namespace create OAUTH_RESULTS
 [[kv_namespaces]]
 binding = "OAUTH_RESULTS"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "2a037c3a8b7e4e67a626c15e4c727253"
 
 # Secrets (not stored here):
 #   npx wrangler secret put GITHUB_OAUTH_CLIENT_ID
