@@ -4,6 +4,8 @@ node_modules/
 .vscode/
 .idea/
 
-# Cloudflare Worker
+# Cloudflare Workers
 worker/.dev.vars
 worker/.wrangler/
+cms-auth/.dev.vars
+cms-auth/.wrangler/

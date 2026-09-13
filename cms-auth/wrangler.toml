@@ -1,0 +1,12 @@
+name = "dcvh-cms-auth"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (not stored here):
+#   npx wrangler secret put GITHUB_OAUTH_CLIENT_ID
+#   npx wrangler secret put GITHUB_OAUTH_CLIENT_SECRET
+#
+# Deployed URL after `npx wrangler deploy`:
+#   https://dcvh-cms-auth.<your-workers-subdomain>.workers.dev
+# This must match admin/config.yml's auth_endpoint / base_url, and the
+# GitHub OAuth App's callback URL must be <that-url>/callback.

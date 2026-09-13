@@ -1,0 +1,15 @@
+{
+  "name": "dcvh-cms-auth",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GitHub OAuth proxy for the Decap CMS admin at /admin.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

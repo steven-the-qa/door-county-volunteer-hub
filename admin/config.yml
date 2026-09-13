@@ -1,0 +1,177 @@
+backend:
+  name: github
+  repo: steven-the-qa/door-county-volunteer-hub
+  branch: main
+  auth_endpoint: https://dcvh-cms-auth.docovolunteerhub.workers.dev/auth
+  base_url: https://dcvh-cms-auth.docovolunteerhub.workers.dev
+
+# Every save opens a GitHub pull request instead of committing straight to
+# main — review the diff there and merge only once you've confirmed the
+# opportunity with the organization.
+publish_mode: editorial_workflow
+
+# Required by Decap even though no field here uses the media widget.
+media_folder: "admin/uploads"
+public_folder: "/admin/uploads"
+
+site_url: https://docovolunteerhub.com
+display_url: https://docovolunteerhub.com
+logo_url: ""
+
+collections:
+  - name: "volunteer_data"
+    label: "Volunteer Hub Data"
+    files:
+      - name: "opportunities"
+        label: "Organizations & Opportunities"
+        file: "data/opportunities.json"
+        description: >
+          One file drives the whole site. New opportunities default to
+          Status = draft and Verified = off, so they will NOT show up on the
+          live site until you switch Verified on (after confirming the
+          details with the organization directly) and Status to "open".
+        fields:
+          - label: "Meta"
+            name: "meta"
+            widget: "object"
+            collapsed: true
+            fields:
+              - label: "Last updated"
+                name: "lastUpdated"
+                widget: "datetime"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                format: "YYYY-MM-DD"
+                picker_utc: true
+              - { label: "Note", name: "note", widget: "string", required: false }
+              - label: "Planned organizations (not yet added as partners)"
+                name: "plannedOrganizations"
+                widget: "list"
+                required: false
+              - label: "Categories (controlled vocabulary)"
+                name: "categories"
+                widget: "list"
+                hint: >
+                  Adding a category here does NOT add it to the picker on
+                  opportunities below — also add it to the "categories"
+                  select options in admin/config.yml (ask Claude/a dev to do
+                  both at once).
+              - label: "Commitment types"
+                name: "commitmentTypes"
+                widget: "list"
+
+          - label: "Organizations"
+            name: "organizations"
+            widget: "list"
+            summary: "{{fields.name}}"
+            fields:
+              - label: "ID"
+                name: "id"
+                widget: "string"
+                hint: "kebab-case, unique, never reuse — e.g. door-county-land-trust"
+                pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers, and hyphens only"]
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Website", name: "website", widget: "string", required: false }
+              - { label: "Location", name: "location", widget: "string", required: false }
+              - { label: "Blurb", name: "blurb", widget: "text", required: false }
+              - label: "Partner status"
+                name: "partnerStatus"
+                widget: "select"
+                options: ["active", "prospective", "paused", "former"]
+                default: "prospective"
+                required: false
+
+          - label: "Opportunities"
+            name: "opportunities"
+            widget: "list"
+            summary: "{{fields.title}} — {{fields.orgId}}"
+            fields:
+              - label: "ID"
+                name: "id"
+                widget: "string"
+                hint: "kebab-case, unique, never reuse — e.g. odbs-raptor-team"
+                pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers, and hyphens only"]
+              - label: "Organization ID"
+                name: "orgId"
+                widget: "string"
+                hint: >
+                  Must exactly match an ID in the Organizations list above.
+                  A typo here fails the automated check on this PR — fix and
+                  re-save if that happens.
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text" }
+              - label: "Categories"
+                name: "categories"
+                widget: "select"
+                multiple: true
+                required: false
+                options:
+                  - "outdoors"
+                  - "animals"
+                  - "manual-labor"
+                  - "events"
+                  - "admin"
+                  - "driving"
+                  - "tabling"
+                  - "youth"
+                  - "food"
+                  - "fundraising"
+              - label: "Commitment"
+                name: "commitment"
+                widget: "select"
+                options: ["one-time", "recurring", "flexible"]
+              - label: "Schedule (when)"
+                name: "schedule"
+                widget: "string"
+                required: false
+                hint: 'e.g. "Saturdays in October, 9am–12pm"'
+              - label: "Location (where)"
+                name: "location"
+                widget: "string"
+                required: false
+              - label: "Minimum age"
+                name: "minAge"
+                widget: "number"
+                value_type: "int"
+                min: 0
+                required: false
+              - label: "Status"
+                name: "status"
+                widget: "select"
+                options: ["draft", "open", "filled", "paused", "closed"]
+                default: "draft"
+                hint: "Only \"open\" shows on the live site."
+              - label: "Verified"
+                name: "verified"
+                widget: "boolean"
+                default: false
+                hint: "Set true only after confirming the details with the organization directly."
+              - label: "Verified date"
+                name: "verifiedDate"
+                widget: "datetime"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                format: "YYYY-MM-DD"
+                picker_utc: true
+                required: false
+              - label: "Posted date"
+                name: "postedDate"
+                widget: "datetime"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                format: "YYYY-MM-DD"
+                picker_utc: true
+              - label: "Expires date"
+                name: "expiresDate"
+                widget: "datetime"
+                date_format: "YYYY-MM-DD"
+                time_format: false
+                format: "YYYY-MM-DD"
+                picker_utc: true
+                required: false
+                hint: "Leave blank for an ongoing role."
+              - label: "Coordinator"
+                name: "coordinator"
+                widget: "string"
+                required: false
+                hint: "Which connector owns following up (e.g. Sam)."

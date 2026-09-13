@@ -12,18 +12,23 @@ See [PRD.md](PRD.md) for the full product/technical spec.
 - `app.js` fetches that file and renders the list in the browser, with filters.
 - Only opportunities that are `status: "open"`, `verified: true`, and not past
   their `expiresDate` (when one is set) are shown.
-- The "Express interest" form posts to [FormSubmit](https://formsubmit.co)
-  (free, no account), which emails the connectors and auto-replies to the volunteer.
+- The "Express interest" form posts to a Cloudflare Worker
+  ([`worker/`](worker)), which sends a branded notification to the team and a
+  branded confirmation to the volunteer via Resend.
+- Content can also be edited through a small admin panel at `/admin`
+  ([Decap CMS](https://decapcms.org)) instead of hand-editing the JSON — see
+  [Admin panel](#admin-panel) below.
 
 ```
 index.html · about.html · privacy.html   static pages
-app.js                                   one script (no framework, no build)
-styles.css                               EMPTY placeholder — visual design pending;
-                                         class hooks are documented at the top of the file
-data/opportunities.json                  the only file you edit day-to-day
+app.js · styles.css                      one script, one basic stylesheet — no framework, no build
+data/opportunities.json                  the only file you edit day-to-day (or use /admin)
 data/opportunities.schema.json            reference schema
 scripts/validate.mjs                      node, no dependencies
 .github/workflows/deploy.yml              validates JSON, deploys to GitHub Pages
+admin/                                    Decap CMS panel, served as part of the site
+worker/                                   Cloudflare Worker: form -> branded emails (Resend)
+cms-auth/                                 Cloudflare Worker: GitHub OAuth for /admin
 ```
 
 ## Editing opportunities
@@ -73,38 +78,14 @@ while, then delete them.
 
 ## One-time setup
 
-### 1. Connect the interest form (FormSubmit)
+### 1. Connect the interest form (Cloudflare Worker + Resend)
 
-The inbox address is **not** in the site source. Activate FormSubmit from a
-terminal instead:
-
-1. Run (once), replacing `<inbox-address>` with the project inbox. The `Origin`
-   header and `-F` (multipart) are both required — `-d` gets rejected:
-   ```bash
-   curl -s -X POST https://formsubmit.co/ajax/<inbox-address> \
-     -H "Origin: https://docovolunteerhub.com" \
-     -F "activate=1" -F "email=<inbox-address>"
-   ```
-   (Already done for this project — alias is wired into `app.js`.)
-2. FormSubmit emails that inbox an "Activate Form" link **and** a permanent
-   random alias URL. Click the link; copy the random alias string.
-3. In `app.js`, set:
-   ```js
-   var FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/<your-alias>";
-   ```
-   The alias keeps the address out of the page source. Commit and push.
-
-Until the alias is set, the form shows an "isn't available yet" message instead
-of submitting. The form sends a table-formatted email and a plain-text
-auto-response to the volunteer.
-
-**Redundancy:** FormSubmit stores nothing, so the email is the only record. In
-Gmail: (a) filter mail from `formsubmit.co` → never spam, label + star; (b) if a
-second person needs every lead, add a Gmail auto-forward from the project inbox
-to their address (keeps the second address off the site too).
-
-The address also appears once on the Privacy page as a contact for
-privacy/deletion requests — that is deliberate.
+The "Express interest" form posts JSON to a small Cloudflare Worker
+([`worker/`](worker)), which sends two branded emails via
+[Resend](https://resend.com): a notification to `team@docovolunteerhub.com`
+(Reply-To: the volunteer) and a confirmation to the volunteer (Reply-To:
+`team@`). Full setup steps, secrets, and testing commands are in
+**[worker/README.md](worker/README.md)**. Nothing here is FormSubmit anymore.
 
 ### 2. Host on GitHub Pages
 
@@ -123,6 +104,18 @@ Live at **https://docovolunteerhub.com** (registered via Squarespace).
   file in this repo matches it.
 - "Enforce HTTPS" is on once GitHub finishes issuing the cert.
 - All links and asset paths in this repo are relative, so nothing else changed.
+
+## Admin panel
+
+`docovolunteerhub.com/admin` is a [Decap CMS](https://decapcms.org) form UI
+for `data/opportunities.json` — an alternative to hand-editing the JSON in an
+editor. It logs in with GitHub (only repo collaborators can), and every save
+opens a **pull request** for review rather than committing straight to
+`main`. New opportunities default to `status: draft` and `verified: false`
+so nothing goes live until a connector confirms it with the organization.
+
+Setup (one-time, needs a GitHub OAuth App + a second small Worker) is in
+**[cms-auth/README.md](cms-auth/README.md)**.
 
 ## Local preview
 
