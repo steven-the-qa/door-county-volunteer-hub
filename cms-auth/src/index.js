@@ -193,6 +193,13 @@ function relayPage() {
       .then(function (data) {
         if (data && data.status) {
           if (window.parent !== window) {
+            // Decap only starts listening for the actual result after it
+            // first sees this exact ping — send it before the real payload,
+            // not instead of it. (Decap replies to the ping by messaging
+            // the original popup, which is long closed by now and will
+            // throw — harmless, it still installs its result listener
+            // first either way.)
+            window.parent.postMessage("authorizing:github", ADMIN_ORIGIN);
             var message = "authorization:github:" + data.status + ":" + JSON.stringify(data.payload);
             window.parent.postMessage(message, ADMIN_ORIGIN);
           }
