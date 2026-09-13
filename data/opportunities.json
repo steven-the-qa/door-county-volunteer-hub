@@ -54,7 +54,7 @@
       "location": "On-site, Sawyer",
       "verifiedDate": "2026-09-09",
       "schedule": "At least once a week. Raptor nights are Mondays and Thursdays.",
-      "title": "Raptor Team volunteer",
+      "title": "Raptor Team Member",
       "id": "odbs-raptor-team",
       "categories": [
         "animals",
@@ -72,7 +72,7 @@
       "location": "On-site and at events",
       "verifiedDate": "2026-09-09",
       "schedule": "Variable — depends on which events are scheduled.",
-      "title": "Education Team volunteer",
+      "title": "Education Team Member",
       "id": "odbs-education-team",
       "categories": [
         "animals",
@@ -87,7 +87,7 @@
       "verified": true,
       "postedDate": "2026-09-13",
       "coordinator": "Sam",
-      "status": "draft",
+      "status": "open",
       "commitment": "recurring",
       "location": "Destination Sturgeon Bay",
       "verifiedDate": "2026-09-13",
