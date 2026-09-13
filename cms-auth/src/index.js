@@ -163,7 +163,7 @@ async function handlePoll(env) {
   });
 }
 
-function readCookie(cookieHeader, name) {
+export function readCookie(cookieHeader, name) {
   const match = cookieHeader
     .split(";")
     .map((c) => c.trim())

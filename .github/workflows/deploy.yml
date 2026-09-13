@@ -24,7 +24,7 @@ jobs:
           node-version: 22
       - name: Validate data/opportunities.json
         run: node scripts/validate.mjs
-      - name: Unit tests (admin/lib.js)
+      - name: Unit tests
         run: node --test
 
   deploy:
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Stage site (exclude non-site files)
-        run: rm -rf worker cms-auth .github scripts admin/lib.test.mjs
+        run: rm -rf worker cms-auth .github scripts admin/lib.test.mjs lib.test.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

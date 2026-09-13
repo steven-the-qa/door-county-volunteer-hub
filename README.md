@@ -28,6 +28,7 @@ scripts/validate.mjs                      node, no dependencies
 .github/workflows/deploy.yml              validates JSON, deploys to GitHub Pages
 admin/                                    Decap CMS panel, served as part of the site
 admin/lib.js · admin/lib.test.mjs         admin panel's tested logic (`node --test`)
+lib.js · lib.test.mjs                     public site's tested logic (`node --test`)
 worker/                                   Cloudflare Worker: form -> branded emails (Resend)
 cms-auth/                                 Cloudflare Worker: GitHub OAuth for /admin
 ```
@@ -128,8 +129,10 @@ node --test
 ```
 
 No dependencies — Node's built-in test runner, same as `validate.mjs`. Runs
-in CI on every push, right alongside the JSON validation. Tests live in
-`admin/lib.test.mjs`.
+in CI on every push, right alongside the JSON validation. This same command
+also covers the public site's `isLive()` filter (`lib.test.mjs`), the
+Worker's branded email templates (`worker/src/emails.test.mjs`), and the
+OAuth Worker's cookie parsing (`cms-auth/src/index.test.mjs`).
 
 ## Local preview
 
