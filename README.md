@@ -27,6 +27,7 @@ data/opportunities.schema.json            reference schema
 scripts/validate.mjs                      node, no dependencies
 .github/workflows/deploy.yml              validates JSON, deploys to GitHub Pages
 admin/                                    Decap CMS panel, served as part of the site
+admin/lib.js · admin/lib.test.mjs         admin panel's tested logic (`node --test`)
 worker/                                   Cloudflare Worker: form -> branded emails (Resend)
 cms-auth/                                 Cloudflare Worker: GitHub OAuth for /admin
 ```
@@ -116,6 +117,19 @@ so nothing goes live until a connector confirms it with the organization.
 
 Setup (one-time, needs a GitHub OAuth App + a second small Worker) is in
 **[cms-auth/README.md](cms-auth/README.md)**.
+
+The admin panel's non-trivial logic (the Help modal's markdown-to-HTML
+renderer and doc-to-tabs parser, and the org-reference cross-check used by
+the Save confirmation) lives in `admin/lib.js`, kept separate from the
+DOM-wiring code specifically so it can be unit tested:
+
+```bash
+node --test
+```
+
+No dependencies — Node's built-in test runner, same as `validate.mjs`. Runs
+in CI on every push, right alongside the JSON validation. Tests live in
+`admin/lib.test.mjs`.
 
 ## Local preview
 
