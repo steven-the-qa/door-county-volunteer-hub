@@ -5,25 +5,209 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
   <title>Door County Volunteer Hub — Content Admin</title>
+  <style>
+    /* Scoped to our own injected elements only — Decap's own UI is untouched. */
+    #dcvh-help-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: #2e5339;
+      color: #fff;
+      font: bold 18px/40px Verdana, Geneva, Arial, sans-serif;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    }
+    #dcvh-help-btn:hover { background: #24422d; }
+
+    #dcvh-help {
+      border: 2px solid #2e5339;
+      padding: 0;
+      max-width: 640px;
+      width: 90%;
+      max-height: 80vh;
+    }
+    #dcvh-help::backdrop { background: rgba(0, 0, 0, 0.5); }
+    #dcvh-help-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #2e5339;
+      color: #fff;
+      font: bold 16px Verdana, Geneva, Arial, sans-serif;
+    }
+    #dcvh-help-close {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    #dcvh-help-body {
+      padding: 18px 22px;
+      overflow-y: auto;
+      max-height: calc(80vh - 52px);
+      font: 14px/1.6 Verdana, Geneva, Arial, sans-serif;
+      color: #222;
+    }
+    #dcvh-help-body h1 { font-size: 19px; margin: 0 0 10px; }
+    #dcvh-help-body h2 { font-size: 16px; margin: 22px 0 8px; }
+    #dcvh-help-body h3 { font-size: 14px; margin: 16px 0 6px; }
+    #dcvh-help-body p { margin: 0 0 12px; }
+    #dcvh-help-body ul, #dcvh-help-body ol { margin: 0 0 12px; padding-left: 22px; }
+    #dcvh-help-body li { margin: 4px 0; }
+    #dcvh-help-body code {
+      background: #eee;
+      padding: 1px 5px;
+      font-size: 13px;
+      border-radius: 3px;
+    }
+    #dcvh-help-body a { color: #2e5339; }
+  </style>
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script>
+  // Everything below is added via script, and only after decap-cms.js above
+  // has already run — Decap takes over <body> on mount, so anything
+  // declared statically in <body> gets wiped before it ever renders.
+
+  // --- OAuth relay iframe ------------------------------------------------
   // Relays the OAuth login result from the popup to Decap CMS. Decap only
   // accepts that message from a window whose origin is exactly the auth
   // backend's base_url — a hidden iframe on that origin satisfies this
   // without ever depending on window.opener (which GitHub's OAuth page
   // breaks). See cms-auth/src/index.js for the full explanation.
-  //
-  // Added via script, and only after decap-cms.js above has already run —
-  // Decap takes over <body> on mount, so a static <iframe> declared before
-  // its script tag gets wiped before the browser ever loads it.
   (function () {
     var relay = document.createElement("iframe");
     relay.src = "https://dcvh-cms-auth.docovolunteerhub.workers.dev/relay.html";
     relay.style.display = "none";
     relay.setAttribute("aria-hidden", "true");
     document.body.appendChild(relay);
+  })();
+
+  // --- Help button + modal ------------------------------------------------
+  (function () {
+    var btn = document.createElement("button");
+    btn.id = "dcvh-help-btn";
+    btn.type = "button";
+    btn.title = "How to use this CMS";
+    btn.setAttribute("aria-label", "How to use this CMS");
+    btn.textContent = "?";
+
+    var dialog = document.createElement("dialog");
+    dialog.id = "dcvh-help";
+    dialog.innerHTML =
+      '<div id="dcvh-help-head">' +
+        '<span>How to use this CMS</span>' +
+        '<button type="button" id="dcvh-help-close" aria-label="Close">×</button>' +
+      '</div>' +
+      '<div id="dcvh-help-body">Loading…</div>';
+
+    document.body.appendChild(dialog);
+    document.body.appendChild(btn);
+
+    var body = dialog.querySelector("#dcvh-help-body");
+    var loaded = false;
+
+    function loadHelp() {
+      if (loaded) return;
+      loaded = true;
+      fetch("help.md", { cache: "no-cache" })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+        .then(function (md) { body.innerHTML = renderMarkdown(md); })
+        .catch(function () {
+          body.textContent = "Couldn't load the help doc. It also lives at admin/help.md in the repo.";
+        });
+    }
+
+    btn.addEventListener("click", function () {
+      loadHelp();
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    });
+    dialog.querySelector("#dcvh-help-close").addEventListener("click", function () {
+      if (typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+    });
+    dialog.addEventListener("click", function (e) {
+      if (e.target === dialog) dialog.close(); // backdrop click
+    });
+
+    // Small markdown -> HTML converter covering just what help.md uses:
+    // #/##/### headings, blank-line paragraphs, "- " and "1. " lists,
+    // **bold**, `code`, and [text](url) links. Not a general CommonMark
+    // implementation on purpose — the source content is ours and stays
+    // within this subset.
+    function renderMarkdown(md) {
+      var lines = md.replace(/\r\n/g, "\n").split("\n");
+      var html = "";
+      var i = 0;
+
+      function esc(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      function inline(s) {
+        s = esc(s);
+        s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+        s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        return s;
+      }
+
+      // Renders a - or 1. list starting at the current line. Any indented
+      // line that follows an item but isn't itself a new item is treated as
+      // a wrapped continuation of that item's text (appended, never
+      // dropped) rather than a true nested list — help.md is written to
+      // avoid real nesting so this never loses content.
+      function renderList(itemRe) {
+        var items = [];
+        while (i < lines.length && lines[i].trim() !== "" && (itemRe.test(lines[i]) || /^\s+\S/.test(lines[i]))) {
+          if (itemRe.test(lines[i])) {
+            items.push(lines[i].replace(itemRe, ""));
+          } else if (items.length) {
+            items[items.length - 1] += " " + lines[i].trim();
+          }
+          i++;
+        }
+        return items;
+      }
+
+      while (i < lines.length) {
+        var line = lines[i];
+        if (/^### /.test(line)) { html += "<h3>" + inline(line.slice(4)) + "</h3>"; i++; continue; }
+        if (/^## /.test(line)) { html += "<h2>" + inline(line.slice(3)) + "</h2>"; i++; continue; }
+        if (/^# /.test(line)) { html += "<h1>" + inline(line.slice(2)) + "</h1>"; i++; continue; }
+
+        if (/^-\s+/.test(line)) {
+          var ulItems = renderList(/^-\s+/);
+          html += "<ul>" + ulItems.map(function (t) { return "<li>" + inline(t) + "</li>"; }).join("") + "</ul>";
+          continue;
+        }
+        if (/^\d+\.\s+/.test(line)) {
+          var olItems = renderList(/^\d+\.\s+/);
+          html += "<ol>" + olItems.map(function (t) { return "<li>" + inline(t) + "</li>"; }).join("") + "</ol>";
+          continue;
+        }
+        if (line.trim() === "") { i++; continue; }
+
+        var para = [line];
+        i++;
+        while (i < lines.length && lines[i].trim() !== "" && !/^(#{1,3}\s|-\s|\d+\.\s)/.test(lines[i])) {
+          para.push(lines[i]);
+          i++;
+        }
+        html += "<p>" + inline(para.join(" ")) + "</p>";
+      }
+      return html;
+    }
   })();
   </script>
 </body>
