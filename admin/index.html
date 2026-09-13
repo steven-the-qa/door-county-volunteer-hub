@@ -81,26 +81,82 @@
       line-height: 1;
       cursor: pointer;
     }
-    #dcvh-help-body {
-      padding: 18px 22px;
+    #dcvh-help-intro {
+      padding: 14px 22px 0;
+      font: 13px/1.5 Verdana, Geneva, Arial, sans-serif;
+      color: #555;
+    }
+    #dcvh-help-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 14px 22px 0;
+      border-bottom: 1px solid #ccc;
+    }
+    .dcvh-tab-btn {
+      font: 13px Verdana, Geneva, Arial, sans-serif;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      background: #eee;
+      color: #333;
+      cursor: pointer;
+      position: relative;
+      top: 1px;
+    }
+    .dcvh-tab-btn[aria-selected="true"] {
+      background: #fff;
+      border-color: #2e5339;
+      border-bottom: 1px solid #fff;
+      color: #2e5339;
+      font-weight: bold;
+    }
+    #dcvh-help-panels {
+      padding: 16px 22px 20px;
       overflow-y: auto;
-      max-height: calc(80vh - 52px);
+      max-height: calc(80vh - 52px - 60px);
       font: 14px/1.6 Verdana, Geneva, Arial, sans-serif;
       color: #222;
     }
-    #dcvh-help-body h1 { font-size: 19px; margin: 0 0 10px; }
-    #dcvh-help-body h2 { font-size: 16px; margin: 22px 0 8px; }
-    #dcvh-help-body h3 { font-size: 14px; margin: 16px 0 6px; }
-    #dcvh-help-body p { margin: 0 0 12px; }
-    #dcvh-help-body ul, #dcvh-help-body ol { margin: 0 0 12px; padding-left: 22px; }
-    #dcvh-help-body li { margin: 4px 0; }
-    #dcvh-help-body code {
+    .dcvh-subtabs {
+      display: flex;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+    .dcvh-subtab-btn {
+      font: 12px Verdana, Geneva, Arial, sans-serif;
+      padding: 5px 12px;
+      border: 1px solid #999;
+      border-radius: 999px;
+      background: #f5f5f5;
+      color: #333;
+      cursor: pointer;
+    }
+    .dcvh-subtab-btn[aria-selected="true"] {
+      background: #2e5339;
+      border-color: #2e5339;
+      color: #fff;
+    }
+    #dcvh-help-panels h1 { font-size: 19px; margin: 0 0 10px; }
+    #dcvh-help-panels h2 { font-size: 16px; margin: 22px 0 8px; }
+    #dcvh-help-panels h3 { font-size: 14px; margin: 16px 0 6px; }
+    #dcvh-help-panels p { margin: 0 0 12px; }
+    #dcvh-help-panels ul, #dcvh-help-panels ol { margin: 0 0 12px; padding-left: 22px; }
+    #dcvh-help-panels li { margin: 4px 0; }
+    #dcvh-help-panels code {
       background: #eee;
       padding: 1px 5px;
       font-size: 13px;
       border-radius: 3px;
     }
-    #dcvh-help-body a { color: #2e5339; }
+    #dcvh-help-panels a { color: #2e5339; }
+    #dcvh-help-intro code {
+      background: #eee;
+      padding: 1px 5px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
@@ -164,12 +220,16 @@
         '<span>How to use this CMS</span>' +
         '<button type="button" id="dcvh-help-close" aria-label="Close">×</button>' +
       '</div>' +
-      '<div id="dcvh-help-body">Loading…</div>';
+      '<div id="dcvh-help-intro"></div>' +
+      '<div id="dcvh-help-tabs" role="tablist" aria-label="Help topics"></div>' +
+      '<div id="dcvh-help-panels">Loading…</div>';
 
     document.body.appendChild(dialog);
     document.body.appendChild(btn);
 
-    var body = dialog.querySelector("#dcvh-help-body");
+    var introEl = dialog.querySelector("#dcvh-help-intro");
+    var tabsEl = dialog.querySelector("#dcvh-help-tabs");
+    var panelsEl = dialog.querySelector("#dcvh-help-panels");
     var loaded = false;
 
     function loadHelp() {
@@ -177,9 +237,10 @@
       loaded = true;
       fetch("help.md", { cache: "no-cache" })
         .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
-        .then(function (md) { body.innerHTML = renderMarkdown(md); })
+        .then(function (md) { buildTabs(parseDoc(md)); })
         .catch(function () {
-          body.textContent = "Couldn't load the help doc. It also lives at admin/help.md in the repo.";
+          tabsEl.innerHTML = "";
+          panelsEl.textContent = "Couldn't load the help doc. It also lives at admin/help.md in the repo.";
         });
     }
 
@@ -195,6 +256,112 @@
     dialog.addEventListener("click", function (e) {
       if (e.target === dialog) dialog.close(); // backdrop click
     });
+
+    // Splits help.md into { introMd, tabs: [{ label, md, subtabs: [{label, md}] }] }
+    // by heading level: the H1's own body text becomes the always-visible
+    // intro, each H2 becomes a tab, and any H3s inside a tab become subtabs.
+    // Kept this simple on purpose — help.md is written to fit exactly this
+    // shape (at most one level of subtabs), not general CommonMark nesting.
+    function parseDoc(md) {
+      var lines = md.replace(/\r\n/g, "\n").split("\n");
+      var i = 0;
+      if (/^# /.test(lines[0] || "")) i = 1;
+
+      var introLines = [];
+      while (i < lines.length && !/^## /.test(lines[i])) { introLines.push(lines[i]); i++; }
+
+      var tabs = [];
+      while (i < lines.length) {
+        var tabLabel = lines[i].replace(/^## /, "").trim();
+        i++;
+        var bodyLines = [];
+        var subtabs = [];
+        while (i < lines.length && !/^## /.test(lines[i])) {
+          if (/^### /.test(lines[i])) {
+            var subLabel = lines[i].replace(/^### /, "").trim();
+            i++;
+            var subLines = [];
+            while (i < lines.length && !/^## /.test(lines[i]) && !/^### /.test(lines[i])) {
+              subLines.push(lines[i]);
+              i++;
+            }
+            subtabs.push({ label: subLabel, md: subLines.join("\n") });
+          } else {
+            bodyLines.push(lines[i]);
+            i++;
+          }
+        }
+        tabs.push({ label: tabLabel, md: bodyLines.join("\n"), subtabs: subtabs });
+      }
+      return { introMd: introLines.join("\n"), tabs: tabs };
+    }
+
+    function buildTabs(doc) {
+      introEl.innerHTML = renderMarkdown(doc.introMd);
+
+      tabsEl.innerHTML = "";
+      panelsEl.innerHTML = "";
+
+      doc.tabs.forEach(function (tab, index) {
+        var tabBtn = document.createElement("button");
+        tabBtn.type = "button";
+        tabBtn.className = "dcvh-tab-btn";
+        tabBtn.setAttribute("role", "tab");
+        tabBtn.textContent = tab.label;
+
+        var panel = document.createElement("div");
+        panel.setAttribute("role", "tabpanel");
+        panel.hidden = index !== 0;
+
+        if (tab.subtabs.length) {
+          var subtabsBar = document.createElement("div");
+          subtabsBar.className = "dcvh-subtabs";
+          subtabsBar.setAttribute("role", "tablist");
+
+          var subPanels = [];
+          tab.subtabs.forEach(function (sub, subIndex) {
+            var subBtn = document.createElement("button");
+            subBtn.type = "button";
+            subBtn.className = "dcvh-subtab-btn";
+            subBtn.setAttribute("role", "tab");
+            subBtn.textContent = sub.label;
+
+            var subPanel = document.createElement("div");
+            subPanel.hidden = subIndex !== 0;
+            subPanel.innerHTML = renderMarkdown(sub.md);
+            subPanels.push(subPanel);
+
+            subBtn.setAttribute("aria-selected", subIndex === 0 ? "true" : "false");
+            subBtn.addEventListener("click", function () {
+              subtabsBar.querySelectorAll(".dcvh-subtab-btn").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+              subPanels.forEach(function (p) { p.hidden = true; });
+              subBtn.setAttribute("aria-selected", "true");
+              subPanel.hidden = false;
+              panelsEl.scrollTop = 0;
+            });
+
+            subtabsBar.appendChild(subBtn);
+          });
+
+          panel.appendChild(subtabsBar);
+          subPanels.forEach(function (p) { panel.appendChild(p); });
+        } else {
+          panel.innerHTML = renderMarkdown(tab.md);
+        }
+
+        tabBtn.setAttribute("aria-selected", index === 0 ? "true" : "false");
+        tabBtn.addEventListener("click", function () {
+          tabsEl.querySelectorAll(".dcvh-tab-btn").forEach(function (b) { b.setAttribute("aria-selected", "false"); });
+          panelsEl.querySelectorAll('[role="tabpanel"]').forEach(function (p) { p.hidden = true; });
+          tabBtn.setAttribute("aria-selected", "true");
+          panel.hidden = false;
+          panelsEl.scrollTop = 0;
+        });
+
+        tabsEl.appendChild(tabBtn);
+        panelsEl.appendChild(panel);
+      });
+    }
 
     // Small markdown -> HTML converter covering just what help.md uses:
     // #/##/### headings, blank-line paragraphs, "- " and "1. " lists,
