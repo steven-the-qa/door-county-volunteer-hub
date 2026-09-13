@@ -65,7 +65,7 @@ collections:
             widget: "list"
             summary: "{{fields.name}}"
             fields:
-              - label: "ID"
+              - label: "Organization ID"
                 name: "id"
                 widget: "string"
                 hint: "kebab-case, unique, never reuse — e.g. door-county-land-trust"
@@ -86,12 +86,12 @@ collections:
             widget: "list"
             summary: "{{fields.title}} — {{fields.orgId}}"
             fields:
-              - label: "ID"
+              - label: "Opportunity ID"
                 name: "id"
                 widget: "string"
                 hint: "kebab-case, unique, never reuse — e.g. odbs-raptor-team"
                 pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers, and hyphens only"]
-              - label: "Organization ID"
+              - label: "Organization"
                 name: "orgId"
                 widget: "orgid"
                 hint: >

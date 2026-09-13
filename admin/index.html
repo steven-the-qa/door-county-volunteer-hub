@@ -202,6 +202,19 @@
       font-size: 13px;
       border-radius: 3px;
     }
+    #dcvh-save-confirm-warning {
+      margin-top: 4px;
+      padding: 10px 12px;
+      background: #fff8e1;
+      border: 1px solid #e0c97f;
+      border-radius: 4px;
+      color: #5c4a13;
+    }
+    #dcvh-save-confirm-warning code {
+      background: rgba(0, 0, 0, 0.08);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
     #dcvh-save-confirm-actions {
       display: flex;
       justify-content: flex-end;
@@ -584,7 +597,66 @@
   // the real save until this confirms. Checked too: no keyboard shortcut
   // triggers Save in this Decap version, so a click-only intercept doesn't
   // leave a bypass route.
+  //
+  // Also cross-checks, at that same moment, that every opportunity's
+  // Organization value matches some organization's Organization ID above —
+  // the same rule scripts/validate.mjs enforces in CI, just surfaced here
+  // before a pull request even opens. This can't read Decap's internal
+  // state (no entry-access in the widget API — see the "orgid" widget
+  // above), so it reads the actual rendered <input> values instead, found
+  // via the <label for="..."> Decap renders for every field (that
+  // association is part of the documented widget Control props: forID).
+  // That's why the two label texts below have to stay exactly what
+  // config.yml sets them to ("Organization ID" / "Organization") — if
+  // either is ever renamed there, update it here too.
+  //
+  // This only warns; it never blocks Save. If a collapsed list item's
+  // fields turn out not to be in the DOM at all (unverified — reachable
+  // only with a live login), this scan would silently miss them, and CI
+  // remains the real backstop either way.
   (function () {
+    var ORG_ID_LABEL = "Organization ID";
+    var ORG_REF_LABEL = "Organization";
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[c]));
+    }
+
+    function inputsByLabel(labelText) {
+      var out = [];
+      document.querySelectorAll("label").forEach(function (label) {
+        if (label.textContent.trim() !== labelText) return;
+        var forId = label.getAttribute("for");
+        var input = forId ? document.getElementById(forId) : null;
+        if (input) out.push(input);
+      });
+      return out;
+    }
+
+    // Returns the list of Organization values on opportunities that don't
+    // match any current Organization ID — [] if everything lines up (or if
+    // there's nothing to check yet, e.g. no orgs added).
+    function findOrphanedOrgRefs() {
+      var validIds = {};
+      inputsByLabel(ORG_ID_LABEL).forEach(function (input) {
+        var v = input.value.trim();
+        if (v) validIds[v] = true;
+      });
+
+      var bad = [];
+      inputsByLabel(ORG_REF_LABEL).forEach(function (input) {
+        var v = input.value.trim();
+        if (v && !validIds[v] && bad.indexOf(v) === -1) bad.push(v);
+      });
+      return bad;
+    }
+
     var dialog = document.createElement("dialog");
     dialog.id = "dcvh-save-confirm";
     dialog.innerHTML =
@@ -592,6 +664,7 @@
       '<div id="dcvh-save-confirm-body">' +
         '<p>Save doesn’t publish anything. It opens a GitHub pull request. Nothing hits the live site until that’s reviewed and merged.</p>' +
         '<p>If you haven’t confirmed this with the org yet, leave <strong>Status</strong> at <code>draft</code> and <strong>Verified</strong> off.</p>' +
+        '<div id="dcvh-save-confirm-warning" hidden></div>' +
       '</div>' +
       '<div id="dcvh-save-confirm-actions">' +
         '<button type="button" id="dcvh-save-confirm-cancel">Cancel</button>' +
@@ -599,12 +672,25 @@
       '</div>';
     document.body.appendChild(dialog);
 
+    var warningEl = dialog.querySelector("#dcvh-save-confirm-warning");
     var cancelBtn = dialog.querySelector("#dcvh-save-confirm-cancel");
     var okBtn = dialog.querySelector("#dcvh-save-confirm-ok");
     var pendingButton = null;
     var bypassNext = false;
 
     function openDialog() {
+      var bad = findOrphanedOrgRefs();
+      if (bad.length) {
+        warningEl.hidden = false;
+        warningEl.innerHTML =
+          "<strong>Heads up:</strong> " +
+          (bad.length === 1 ? "this Organization value doesn’t" : "these Organization values don’t") +
+          " match any Organization ID above: " +
+          bad.map(function (v) { return "<code>" + escapeHtml(v) + "</code>"; }).join(", ") +
+          ". Fixing it now avoids a failed check on the pull request.";
+      } else {
+        warningEl.hidden = true;
+      }
       if (typeof dialog.showModal === "function") dialog.showModal();
       else dialog.setAttribute("open", "");
     }
