@@ -20,9 +20,12 @@
       "food",
       "fundraising"
     ],
-    "commitmentTypes": ["one-time", "recurring", "flexible"]
+    "commitmentTypes": [
+      "one-time",
+      "recurring",
+      "flexible"
+    ]
   },
-
   "organizations": [
     {
       "id": "open-door-bird-sanctuary",
@@ -31,39 +34,72 @@
       "location": "Sawyer / Sturgeon Bay, WI",
       "blurb": "Raptor sanctuary and nature center on 40 wooded acres above the lakeshore.",
       "partnerStatus": "active"
-    }
-  ],
-
-  "opportunities": [
-    {
-      "id": "odbs-raptor-team",
-      "orgId": "open-door-bird-sanctuary",
-      "title": "Raptor Team volunteer",
-      "description": "Train to handle the sanctuary's birds of prey: work directly with the raptors and help keep their enclosures clean. Handlers get hands-on training before working with the birds.",
-      "categories": ["animals", "manual-labor"],
-      "commitment": "recurring",
-      "schedule": "At least once a week. Raptor nights are Mondays and Thursdays.",
-      "location": "On-site, Sawyer",
-      "status": "open",
-      "verified": true,
-      "verifiedDate": "2026-09-09",
-      "postedDate": "2026-09-09",
-      "coordinator": "Sam"
     },
     {
-      "id": "odbs-education-team",
-      "orgId": "open-door-bird-sanctuary",
-      "title": "Education Team volunteer",
-      "description": "Help the public connect with the birds without handling them yourself. Work alongside the handlers at events, talk with visitors, and learn to teach people about the raptors.",
-      "categories": ["animals", "events", "tabling"],
-      "commitment": "flexible",
-      "schedule": "Variable — depends on which events are scheduled.",
-      "location": "On-site and at events",
-      "status": "open",
+      "partnerStatus": "active",
+      "id": "community-food-rescue",
+      "name": "Community Food Rescue",
+      "website": "https://www.facebook.com/p/Food-Rescue-A-Full-Hearts-Fridge-Initiative-61589260305803/",
+      "location": "Sturgeon Bay",
+      "blurb": "Partnership between Lakeshore CAP, Destination Sturgeon Bay, and Door County Mutual Aid. Bringing food to those in need."
+    }
+  ],
+  "opportunities": [
+    {
       "verified": true,
-      "verifiedDate": "2026-09-09",
       "postedDate": "2026-09-09",
-      "coordinator": "Sam"
+      "coordinator": "Sam",
+      "status": "open",
+      "commitment": "recurring",
+      "location": "On-site, Sawyer",
+      "verifiedDate": "2026-09-09",
+      "schedule": "At least once a week. Raptor nights are Mondays and Thursdays.",
+      "title": "Raptor Team volunteer",
+      "id": "odbs-raptor-team",
+      "categories": [
+        "animals",
+        "manual-labor"
+      ],
+      "description": "Train to handle the sanctuary's birds of prey: work directly with the raptors and help keep their enclosures clean. Handlers get hands-on training before working with the birds.",
+      "orgId": "open-door-bird-sanctuary"
+    },
+    {
+      "verified": true,
+      "postedDate": "2026-09-09",
+      "coordinator": "Sam",
+      "status": "open",
+      "commitment": "flexible",
+      "location": "On-site and at events",
+      "verifiedDate": "2026-09-09",
+      "schedule": "Variable — depends on which events are scheduled.",
+      "title": "Education Team volunteer",
+      "id": "odbs-education-team",
+      "categories": [
+        "animals",
+        "events",
+        "tabling"
+      ],
+      "description": "Help the public connect with the birds without handling them yourself. Work alongside the handlers at events, talk with visitors, and learn to teach people about the raptors.",
+      "orgId": "open-door-bird-sanctuary"
+    },
+    {
+      "expiresDate": "2026-10-10",
+      "verified": true,
+      "postedDate": "2026-09-13",
+      "coordinator": "Sam",
+      "status": "draft",
+      "commitment": "recurring",
+      "location": "Destination Sturgeon Bay",
+      "verifiedDate": "2026-09-13",
+      "schedule": "Saturdays, 10:30am-1pm, May - October",
+      "title": "Food Rescuer",
+      "id": "cfr-food-rescuer",
+      "categories": [
+        "manual-labor",
+        "food"
+      ],
+      "description": "Hand out bags to vendors at the farmer's market at 10:45, collect the bags at 11:45, then take the bags to Lakeshore CAP to weigh, document the weight contributed by each vendor, and store the food in the fridge.",
+      "orgId": "community-food-rescue"
     }
   ]
 }
