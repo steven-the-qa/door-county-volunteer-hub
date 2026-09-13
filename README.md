@@ -68,6 +68,9 @@ Rules:
 - `id` / `orgId`: lowercase, digits, hyphens only. Never reuse an `id`.
 - `status`: `open` shows; `filled` / `paused` / `closed` / `draft` hide.
 - `verified`: only `true` after a connector confirms the need with the org.
+- `postedDate`: can be set in the past, today, or the future. A future date
+  keeps the listing hidden until that date arrives — useful for queuing up
+  an opportunity ahead of time.
 - `expiresDate`: **optional**. Set it for one-time or time-boxed opportunities and
   the listing auto-hides after that date. Omit it for ongoing roles.
 - `categories`: keep to the list in `meta.categories` (the validator warns otherwise).

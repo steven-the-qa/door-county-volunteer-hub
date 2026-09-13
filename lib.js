@@ -8,12 +8,14 @@
 // explanation of why this split exists.
 
 // Decides whether an opportunity shows on the public site: open, verified,
-// and (if an expiresDate is set at all) not yet past it. `today` is passed
-// in rather than read from the clock in here, so this stays deterministic
-// and testable regardless of what day it actually is.
+// not yet posted in the future, and (if an expiresDate is set at all) not
+// yet past it. `today` is passed in rather than read from the clock in
+// here, so this stays deterministic and testable regardless of what day it
+// actually is.
 export function isLive(op, today) {
   if (op.status !== "open") return false;
   if (op.verified !== true) return false;
+  if (op.postedDate && op.postedDate > today) return false;
   if (op.expiresDate && op.expiresDate < today) return false;
   return true;
 }

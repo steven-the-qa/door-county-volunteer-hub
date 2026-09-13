@@ -29,7 +29,7 @@ Opportunities."**
 5. Fill in **Schedule** and **Location** as plain text, e.g. "Saturdays, 9am–12pm."
 6. Set **Minimum age** if there is one. Optional.
 7. Leave **Status** and **Verified** at their defaults (`draft`, off) until you've confirmed the opening with the org. Nothing here goes live on its own.
-8. Set **Posted date** to today. Leave **Expires date** blank for an ongoing role.
+8. Set **Posted date** to today, or a future date to queue it up — it stays hidden until that date. Leave **Expires date** blank for an ongoing role.
 9. Set **Coordinator**: Sam or Steven, whoever's following up.
 
 ## Publish

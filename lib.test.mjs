@@ -44,3 +44,19 @@ test("isLive: expiresDate in the past -> not live", () => {
 test("isLive: an ongoing role with no expiresDate never auto-expires", () => {
   assert.equal(isLive(op({ expiresDate: undefined }), TODAY), true);
 });
+
+test("isLive: postedDate in the future -> not yet visible", () => {
+  assert.equal(isLive(op({ postedDate: "2026-09-10" }), TODAY), false);
+});
+
+test("isLive: postedDate is today -> visible", () => {
+  assert.equal(isLive(op({ postedDate: "2026-09-09" }), TODAY), true);
+});
+
+test("isLive: postedDate in the past -> visible", () => {
+  assert.equal(isLive(op({ postedDate: "2026-09-08" }), TODAY), true);
+});
+
+test("isLive: no postedDate at all -> visible", () => {
+  assert.equal(isLive(op({ postedDate: undefined }), TODAY), true);
+});
