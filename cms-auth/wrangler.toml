@@ -2,6 +2,13 @@ name = "dcvh-cms-auth"
 main = "src/index.js"
 compatibility_date = "2024-11-01"
 
+# One-time setup — create the namespace, then replace `id` below with what
+# it prints (see cms-auth/README.md):
+#   npx wrangler kv namespace create OAUTH_RESULTS
+[[kv_namespaces]]
+binding = "OAUTH_RESULTS"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
 # Secrets (not stored here):
 #   npx wrangler secret put GITHUB_OAUTH_CLIENT_ID
 #   npx wrangler secret put GITHUB_OAUTH_CLIENT_SECRET

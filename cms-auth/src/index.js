@@ -2,38 +2,53 @@
 //
 // Routes:
 //   GET /auth        -> redirect the CMS login popup to GitHub's authorize page
-//   GET /callback     -> exchange the code for a token, write the result to
-//                        this origin's localStorage, close the popup
-//   GET /relay.html   -> meant to be embedded as a hidden iframe on /admin.
-//                        Relays that localStorage result to the admin page.
+//   GET /callback    -> exchange the code for a token, stash the result in KV
+//   GET /poll        -> read (and clear) the stashed result
+//   GET /relay.html  -> hidden iframe on /admin; polls /poll and relays the
+//                       result to the admin tab
 //
-// Why the indirection: Decap's own bundle (checked directly) only accepts
-// the login message when `event.origin === this.base_url` — i.e. it must
-// come from a window whose origin is exactly this Worker's origin. A popup
-// would normally provide that via `window.opener.postMessage(...)`, but
-// GitHub's OAuth consent page sends Cross-Origin-Opener-Policy, which
-// permanently nulls the popup's `window.opener` the moment it navigates
-// there — before the popup ever reaches this Worker. So there is no window
-// reference *and* no way to send the message from the right origin via the
-// popup alone.
+// Why this shape (skip if you just want it working): two earlier approaches
+// failed for reasons that only show up in a real browser, not in code
+// review, so they're recorded here to save re-discovering them.
 //
-// The fix: admin/index.html embeds a hidden, persistent <iframe> pointed at
-// /relay.html. Iframes aren't touched by COOP (it only isolates top-level
-// popups), so the iframe's link to its parent (the admin tab) always works,
-// and since the iframe genuinely lives on this Worker's origin, a message it
-// sends satisfies Decap's origin check. The popup and that iframe are
-// same-origin, so they can hand the token off via localStorage without ever
-// needing window.opener.
+//   v1: popup posts to window.opener directly. Broken -- GitHub's OAuth
+//   consent page sends Cross-Origin-Opener-Policy, which permanently nulls
+//   window.opener the instant the popup navigates there. Confirmed directly
+//   in-browser (both a normal profile and Incognito): window.opener was
+//   null on the popup every time, so there is no reference left to
+//   postMessage through, full stop.
+//
+//   v2: a hidden same-origin iframe on /admin relays via localStorage
+//   instead. The "same-origin iframe" part was necessary and correct --
+//   Decap's own bundle (checked directly) requires the message's
+//   event.origin to exactly equal `base_url`, and iframes (unlike popups)
+//   aren't touched by COOP. But the localStorage hand-off from the popup to
+//   that iframe silently never arrived: modern browsers partition storage
+//   by top-level site for third-party embeds, so the iframe -- a
+//   third-party context under docovolunteerhub.com -- gets a *different*
+//   localStorage bucket than the popup, which visits this Worker's origin
+//   top-level (first-party, unpartitioned). Confirmed by writing from one
+//   top-level tab on this origin and reading from a second top-level tab
+//   (worked instantly) vs. reading from the embedded iframe (never arrived).
+//
+//   v3 (this version): no client-side storage at all. The popup's
+//   /callback stashes the result server-side in KV; the iframe polls /poll
+//   over plain fetch(), which isn't subject to either of the above.
 //
 // Secrets (never in this repo):
 //   npx wrangler secret put GITHUB_OAUTH_CLIENT_ID
 //   npx wrangler secret put GITHUB_OAUTH_CLIENT_SECRET
+//
+// KV (one-time setup, see cms-auth/README.md):
+//   npx wrangler kv namespace create OAUTH_RESULTS
+//   -> paste the printed [[kv_namespaces]] block into wrangler.toml
+//   npx wrangler deploy
 
 const GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 const GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
 const SCOPE = "public_repo"; // repo is public; this covers contents + PRs
 const STATE_COOKIE = "dcvh_oauth_state";
-const STORAGE_KEY = "dcvh_oauth_result";
+const KV_KEY = "pending";
 const ADMIN_ORIGIN = "https://docovolunteerhub.com";
 
 export default {
@@ -41,6 +56,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/auth") return handleAuth(url, env);
     if (url.pathname === "/callback") return handleCallback(request, url, env);
+    if (url.pathname === "/poll") return handlePoll(env);
     if (url.pathname === "/relay.html") return relayPage();
     return new Response("Not found", { status: 404 });
   },
@@ -72,7 +88,7 @@ async function handleCallback(request, url, env) {
   const clearCookie = `${STATE_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 
   if (!code || !state || !cookieState || state !== cookieState) {
-    return resultPage("error", { message: "Login state mismatch — please try again." }, clearCookie);
+    return finish("error", { message: "Login state mismatch — please try again." }, env, clearCookie);
   }
 
   const redirectUri = new URL("/callback", url).toString();
@@ -90,18 +106,61 @@ async function handleCallback(request, url, env) {
     });
     tokenBody = await tokenRes.json();
   } catch {
-    return resultPage("error", { message: "Could not reach GitHub." }, clearCookie);
+    return finish("error", { message: "Could not reach GitHub." }, env, clearCookie);
   }
 
   if (!tokenBody || !tokenBody.access_token) {
-    return resultPage(
+    return finish(
       "error",
       { message: tokenBody && tokenBody.error_description ? tokenBody.error_description : "No token returned." },
+      env,
       clearCookie
     );
   }
 
-  return resultPage("success", { token: tokenBody.access_token, provider: "github" }, clearCookie);
+  return finish("success", { token: tokenBody.access_token, provider: "github" }, env, clearCookie);
+}
+
+async function finish(status, payload, env, setCookie) {
+  try {
+    await env.OAUTH_RESULTS.put(KV_KEY, JSON.stringify({ status, payload }), { expirationTtl: 120 });
+  } catch (e) {
+    return new Response(
+      `Server not fully configured (KV): ${String(e)}. See cms-auth/README.md's KV setup step.`,
+      { status: 500, headers: { "Set-Cookie": setCookie } }
+    );
+  }
+
+  const humanNote =
+    status === "success" ? "You're logged in — this window will close." : `Login failed: ${payload.message}`;
+  const html = `<!doctype html>
+<html>
+<body>
+  <p>${escapeHtml(humanNote)}</p>
+  <p>If this window is still open after a few seconds, close it and try logging in again from the admin tab.</p>
+  <script>setTimeout(function () { window.close(); }, 300);</script>
+</body>
+</html>`;
+
+  return new Response(html, {
+    status: status === "success" ? 200 : 400,
+    headers: { "Content-Type": "text/html; charset=utf-8", "Set-Cookie": setCookie },
+  });
+}
+
+// Polled by the relay iframe. Reads and immediately clears the pending
+// result so a stale/replayed value can't be picked up twice.
+async function handlePoll(env) {
+  let raw = null;
+  try {
+    raw = await env.OAUTH_RESULTS.get(KV_KEY);
+    if (raw) await env.OAUTH_RESULTS.delete(KV_KEY);
+  } catch {
+    // KV hiccup — treat as "nothing yet", the iframe will just poll again.
+  }
+  return new Response(raw || "{}", {
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
 }
 
 function readCookie(cookieHeader, name) {
@@ -112,73 +171,41 @@ function readCookie(cookieHeader, name) {
   return match ? match.slice(name.length + 1) : null;
 }
 
-// Rendered on THIS origin (dcvh-cms-auth...workers.dev) in the popup. Writes
-// the result to this origin's localStorage — shared with the hidden relay
-// iframe embedded in /admin — then closes itself. No window.opener use at all.
-function resultPage(status, payload, setCookie) {
-  const humanNote = status === "success" ? "You're logged in — this window will close." : `Login failed: ${payload.message}`;
-  const html = `<!doctype html>
-<html>
-<body>
-  <p>${escapeHtml(humanNote)}</p>
-  <p>If this window is still open after a few seconds, close it and try logging in again from the admin tab.</p>
-  <script>
-  (function () {
-    try {
-      localStorage.setItem(${JSON.stringify(STORAGE_KEY)}, JSON.stringify({
-        status: ${JSON.stringify(status)},
-        payload: ${JSON.stringify(payload)},
-        ts: Date.now()
-      }));
-    } catch (e) {}
-    setTimeout(function () { window.close(); }, 300);
-  })();
-  </script>
-</body>
-</html>`;
-
-  return new Response(html, {
-    status: status === "success" ? 200 : 400,
-    headers: { "Content-Type": "text/html; charset=utf-8", "Set-Cookie": setCookie },
-  });
-}
-
-// Served for the hidden iframe embedded on /admin. Lives on this Worker's
-// origin the whole time the admin page is open, so it's never touched by
-// GitHub's COOP header, and messages it sends satisfy Decap's
-// `event.origin === base_url` check.
+// Embedded as a hidden iframe on /admin (added via script, after Decap's own
+// script tag — Decap takes over <body> on mount and wipes anything declared
+// before it). Lives on this Worker's origin the whole time the admin page is
+// open, so a message it sends satisfies Decap's `event.origin === base_url`
+// check. Polls /poll over plain same-origin fetch(), not client storage.
 function relayPage() {
   const html = `<!doctype html>
 <html>
 <body>
 <script>
 (function () {
-  var KEY = ${JSON.stringify(STORAGE_KEY)};
   var ADMIN_ORIGIN = ${JSON.stringify(ADMIN_ORIGIN)};
+  var attempts = 0;
+  var MAX_ATTEMPTS = 90; // ~90s at 1s apart
 
-  function relay(status, payload) {
-    if (window.parent === window) return;
-    var message = "authorization:github:" + status + ":" + JSON.stringify(payload);
-    window.parent.postMessage(message, ADMIN_ORIGIN);
+  function poll() {
+    attempts += 1;
+    fetch("/poll", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.status) {
+          if (window.parent !== window) {
+            var message = "authorization:github:" + data.status + ":" + JSON.stringify(data.payload);
+            window.parent.postMessage(message, ADMIN_ORIGIN);
+          }
+          return; // stop polling either way
+        }
+        if (attempts < MAX_ATTEMPTS) setTimeout(poll, 1000);
+      })
+      .catch(function () {
+        if (attempts < MAX_ATTEMPTS) setTimeout(poll, 1500);
+      });
   }
 
-  function consume() {
-    var raw;
-    try { raw = localStorage.getItem(KEY); } catch (e) { return; }
-    if (!raw) return;
-    try {
-      var result = JSON.parse(raw);
-      relay(result.status, result.payload);
-    } catch (e) {}
-    try { localStorage.removeItem(KEY); } catch (e) {}
-  }
-
-  // Pick up a result that arrived before this iframe finished loading.
-  consume();
-  // And anything that arrives afterward, from the popup (same origin).
-  window.addEventListener("storage", function (e) {
-    if (e.key === KEY && e.newValue) consume();
-  });
+  poll();
 })();
 </script>
 </body>

@@ -12,16 +12,26 @@ secret that can't live in a static page.
 ```
 You visit docovolunteerhub.com/admin
   -> Decap CMS loads, shows "Login with GitHub"
+  -> a hidden iframe on the page loads this Worker's /relay.html and starts polling
   -> popup opens to this Worker's /auth
   -> Worker redirects the popup to GitHub's own login/consent screen
   -> GitHub redirects back to this Worker's /callback with a code
-  -> Worker exchanges the code for a token (using the client secret)
-  -> Worker hands the token to the popup, which passes it back to Decap
+  -> Worker exchanges the code for a token (using the client secret) and
+     stashes the result in KV, then the popup closes itself
+  -> the iframe's next poll picks up the result and hands it to Decap
   -> Decap now talks to the GitHub API directly, as you, to read/write files
 ```
 
-The Worker never sees or stores your content edits — it only brokers the
-login. Every edit goes through your own GitHub account and permissions.
+The Worker never sees or stores your content edits, only the login handoff
+(and only for a couple of minutes, then it expires) — every edit goes
+through your own GitHub account and permissions.
+
+This is more moving parts than a typical popup-OAuth flow because the
+simpler versions don't actually work here: GitHub's OAuth page breaks
+`window.opener`, and browser storage partitioning breaks sharing
+`localStorage` between the popup and an iframe embedded on another site.
+Both are explained in detail in the comment at the top of `src/index.js` if
+you're curious or need to change this later.
 
 ## One-time setup
 
@@ -37,12 +47,24 @@ OAuth App**:
 Save it, then **Generate a new client secret**. Copy both the **Client ID**
 and the **Client Secret** — you'll paste them into Cloudflare next.
 
-### 2. Deploy the Worker
+### 2. Create the KV namespace
+
+Holds the login result for a couple of minutes between the popup finishing
+and the admin page picking it up.
 
 ```bash
 cd cms-auth
 npm install
 npx wrangler login
+npx wrangler kv namespace create OAUTH_RESULTS
+```
+
+That prints an `id`. Open `wrangler.toml` and replace
+`REPLACE_WITH_KV_NAMESPACE_ID` with it.
+
+### 3. Deploy the Worker
+
+```bash
 npx wrangler deploy
 npx wrangler secret put GITHUB_OAUTH_CLIENT_ID
 npx wrangler secret put GITHUB_OAUTH_CLIENT_SECRET
@@ -54,7 +76,7 @@ GitHub OAuth App's callback URL and `admin/config.yml`'s `auth_endpoint` /
 `base_url`. If Cloudflare gives you a different subdomain, update both of
 those to match and redeploy.
 
-### 3. Give teammates access
+### 4. Give teammates access
 
 Decap's GitHub backend uses your actual GitHub permissions — whoever logs in
 needs **write access to this repo**. Add them at repo **Settings →
