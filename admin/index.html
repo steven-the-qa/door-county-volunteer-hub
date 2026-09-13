@@ -6,7 +6,38 @@
   <meta name="robots" content="noindex" />
   <title>Door County Volunteer Hub — Content Admin</title>
   <style>
-    /* Scoped to our own injected elements only — Decap's own UI is untouched. */
+    /* Scoped to our own injected elements, plus one targeted override below. */
+
+    /* Shrinks + fades Decap's own logo on the login screen. Targeted by the
+       readable part of its (emotion-generated) class name rather than the
+       volatile hash prefix, so it survives minor Decap version bumps. If a
+       future Decap update renames this, the logo just goes back to normal
+       size — nothing breaks. */
+    span[class*="DecapLogoIcon"] {
+      transform: scale(0.5);
+      transform-origin: center;
+      opacity: 0.35;
+    }
+
+    #dcvh-brand {
+      position: fixed;
+      top: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      text-align: center;
+      pointer-events: none;
+    }
+    #dcvh-brand-title {
+      font: bold 24px Verdana, Geneva, Arial, sans-serif;
+      color: #2e5339;
+    }
+    #dcvh-brand-sub {
+      margin-top: 2px;
+      font: 12px Verdana, Geneva, Arial, sans-serif;
+      color: #888;
+    }
+
     #dcvh-help-btn {
       position: fixed;
       right: 20px;
@@ -91,6 +122,30 @@
     relay.style.display = "none";
     relay.setAttribute("aria-hidden", "true");
     document.body.appendChild(relay);
+  })();
+
+  // --- "Admin Panel" branding on the login screen -------------------------
+  // Appended as a sibling of Decap's own root, never a child of it, so
+  // React never has a reason to touch or remove it (same reasoning as the
+  // relay iframe above). Only shown while Decap's login screen is actually
+  // in the DOM — a MutationObserver tracks that, since Decap has no event
+  // for "showing the login screen" we could hook into instead.
+  (function () {
+    var brand = document.createElement("div");
+    brand.id = "dcvh-brand";
+    brand.innerHTML =
+      '<div id="dcvh-brand-title">Admin Panel</div>' +
+      '<div id="dcvh-brand-sub">powered by Decap</div>';
+    document.body.appendChild(brand);
+
+    function onLoginScreen() {
+      return !!document.querySelector('[class*="StyledAuthenticationPage"]');
+    }
+    function sync() {
+      brand.hidden = !onLoginScreen();
+    }
+    sync();
+    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true });
   })();
 
   // --- Help button + modal ------------------------------------------------
