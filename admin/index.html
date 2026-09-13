@@ -6,36 +6,54 @@
   <meta name="robots" content="noindex" />
   <title>Door County Volunteer Hub — Content Admin</title>
   <style>
-    /* Scoped to our own injected elements, plus one targeted override below. */
+    /* Scoped entirely to our own injected elements — Decap's own UI is
+       never targeted or touched by anything in this file. */
 
-    /* Shrinks + fades Decap's own logo on the login screen. Targeted by the
-       readable part of its (emotion-generated) class name rather than the
-       volatile hash prefix, so it survives minor Decap version bumps. If a
-       future Decap update renames this, the logo just goes back to normal
-       size — nothing breaks. */
-    span[class*="DecapLogoIcon"] {
-      transform: scale(0.5);
-      transform-origin: center;
-      opacity: 0.35;
-    }
-
-    #dcvh-brand {
+    /* Full-screen cover shown on load, removed for good on click. Decap
+       mounts normally underneath the whole time; this just sits on top of
+       it, so there's nothing here that depends on Decap's own markup. */
+    #dcvh-gate {
       position: fixed;
-      top: 44px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9998;
+      inset: 0;
+      z-index: 9000;
+      background: #fbfaf7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      pointer-events: none;
+      padding: 20px;
     }
-    #dcvh-brand-title {
-      font: bold 24px Verdana, Geneva, Arial, sans-serif;
+    #dcvh-gate-title {
+      font: bold 28px Verdana, Geneva, Arial, sans-serif;
       color: #2e5339;
+      margin-bottom: 4px;
     }
-    #dcvh-brand-sub {
-      margin-top: 2px;
-      font: 12px Verdana, Geneva, Arial, sans-serif;
-      color: #888;
+    #dcvh-gate-sub {
+      font: 14px Verdana, Geneva, Arial, sans-serif;
+      color: #555;
+      margin-bottom: 22px;
+    }
+    #dcvh-gate-body {
+      max-width: 360px;
+      margin: 0 auto 26px;
+      font: 14px/1.5 Verdana, Geneva, Arial, sans-serif;
+      color: #333;
+    }
+    #dcvh-gate-continue {
+      background: #2e5339;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font: bold 15px Verdana, Geneva, Arial, sans-serif;
+      padding: 11px 22px;
+      cursor: pointer;
+    }
+    #dcvh-gate-continue:hover { background: #24422d; }
+    #dcvh-gate-back {
+      display: block;
+      margin-top: 18px;
+      font: 13px Verdana, Geneva, Arial, sans-serif;
+      color: #2e5339;
     }
 
     #dcvh-help-btn {
@@ -291,28 +309,33 @@
     document.body.appendChild(relay);
   })();
 
-  // --- "Admin Panel" branding on the login screen -------------------------
-  // Appended as a sibling of Decap's own root, never a child of it, so
-  // React never has a reason to touch or remove it (same reasoning as the
-  // relay iframe above). Only shown while Decap's login screen is actually
-  // in the DOM — a MutationObserver tracks that, since Decap has no event
-  // for "showing the login screen" we could hook into instead.
+  // --- "Admin Panel" gate screen -------------------------------------------
+  // A full-screen cover, entirely our own markup, shown the instant this
+  // script runs and removed for good on click. Decap mounts normally the
+  // whole time underneath it — this never reads or reacts to anything of
+  // Decap's, so unlike the old approach it has zero dependency on Decap's
+  // internal class names. Appended as a sibling of Decap's own root (never
+  // a child of it) so React has no reason to touch it, same reasoning as
+  // the relay iframe above.
   (function () {
-    var brand = document.createElement("div");
-    brand.id = "dcvh-brand";
-    brand.innerHTML =
-      '<div id="dcvh-brand-title">Admin Panel</div>' +
-      '<div id="dcvh-brand-sub">powered by Decap</div>';
-    document.body.appendChild(brand);
+    var gate = document.createElement("div");
+    gate.id = "dcvh-gate";
+    gate.innerHTML =
+      '<div>' +
+        '<div id="dcvh-gate-title">Admin Panel</div>' +
+        '<div id="dcvh-gate-sub">Door County Volunteer Hub</div>' +
+        '<div id="dcvh-gate-body">' +
+          "You'll log in with your GitHub account. Only people added as " +
+          'collaborators on the repo can get in.' +
+        '</div>' +
+        '<button type="button" id="dcvh-gate-continue">Continue to login</button>' +
+        '<a id="dcvh-gate-back" href="https://docovolunteerhub.com">← Back to the site</a>' +
+      '</div>';
+    document.body.appendChild(gate);
 
-    function onLoginScreen() {
-      return !!document.querySelector('[class*="StyledAuthenticationPage"]');
-    }
-    function sync() {
-      brand.hidden = !onLoginScreen();
-    }
-    sync();
-    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true });
+    document.getElementById("dcvh-gate-continue").addEventListener("click", function () {
+      gate.remove();
+    });
   })();
 
   // --- Help button + modal ------------------------------------------------
