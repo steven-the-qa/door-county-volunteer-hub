@@ -157,6 +157,58 @@
       font-size: 12px;
       border-radius: 3px;
     }
+
+    #dcvh-save-confirm {
+      border: 2px solid #2e5339;
+      padding: 0;
+      max-width: 420px;
+      width: 90%;
+    }
+    #dcvh-save-confirm::backdrop { background: rgba(0, 0, 0, 0.5); }
+    #dcvh-save-confirm-head {
+      padding: 14px 18px;
+      background: #2e5339;
+      color: #fff;
+      font: bold 16px Verdana, Geneva, Arial, sans-serif;
+    }
+    #dcvh-save-confirm-body {
+      padding: 18px;
+      font: 14px/1.5 Verdana, Geneva, Arial, sans-serif;
+      color: #222;
+    }
+    #dcvh-save-confirm-body p { margin: 0 0 12px; }
+    #dcvh-save-confirm-body p:last-child { margin-bottom: 0; }
+    #dcvh-save-confirm-body code {
+      background: #eee;
+      padding: 1px 5px;
+      font-size: 13px;
+      border-radius: 3px;
+    }
+    #dcvh-save-confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 0 18px 18px;
+    }
+    #dcvh-save-confirm-cancel {
+      background: none;
+      border: none;
+      color: #2e5339;
+      text-decoration: underline;
+      font: 14px Verdana, Geneva, Arial, sans-serif;
+      cursor: pointer;
+      padding: 8px 4px;
+    }
+    #dcvh-save-confirm-ok {
+      background: #2e5339;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font: bold 14px Verdana, Geneva, Arial, sans-serif;
+      padding: 9px 16px;
+      cursor: pointer;
+    }
+    #dcvh-save-confirm-ok:hover { background: #24422d; }
   </style>
 </head>
 <body>
@@ -430,6 +482,82 @@
       }
       return html;
     }
+  })();
+
+  // --- Confirm before Save actually happens -------------------------------
+  // Decap's Save button creates/updates a pull request with zero explanation
+  // of that in the moment — checked directly against its bundled source:
+  // there's no confirmation dialog anywhere in its Save path (only its
+  // separate, later Publish/merge step has one, and even that never
+  // mentions "pull request"). There's also a documented preSave event
+  // (CMS.registerEventListener), but its return value is only ever used to
+  // rewrite the entry's data before saving — persistEntry calls it and then
+  // unconditionally continues to the real save regardless of what it
+  // returns, so it can't cancel anything. Intercepting the actual button
+  // click is the only way to make Save genuinely cancelable.
+  //
+  // Mechanism: a capture-phase listener on document always runs before
+  // Decap's own click handler (which React attaches in the bubble phase on
+  // its root container), so stopImmediatePropagation() here reliably blocks
+  // the real save until this confirms. Checked too: no keyboard shortcut
+  // triggers Save in this Decap version, so a click-only intercept doesn't
+  // leave a bypass route.
+  (function () {
+    var dialog = document.createElement("dialog");
+    dialog.id = "dcvh-save-confirm";
+    dialog.innerHTML =
+      '<div id="dcvh-save-confirm-head">Before you save</div>' +
+      '<div id="dcvh-save-confirm-body">' +
+        '<p>Save doesn’t publish anything. It opens a GitHub pull request. Nothing hits the live site until that’s reviewed and merged.</p>' +
+        '<p>If you haven’t confirmed this with the org yet, leave <strong>Status</strong> at <code>draft</code> and <strong>Verified</strong> off.</p>' +
+      '</div>' +
+      '<div id="dcvh-save-confirm-actions">' +
+        '<button type="button" id="dcvh-save-confirm-cancel">Cancel</button>' +
+        '<button type="button" id="dcvh-save-confirm-ok">Save — opens a pull request</button>' +
+      '</div>';
+    document.body.appendChild(dialog);
+
+    var cancelBtn = dialog.querySelector("#dcvh-save-confirm-cancel");
+    var okBtn = dialog.querySelector("#dcvh-save-confirm-ok");
+    var pendingButton = null;
+    var bypassNext = false;
+
+    function openDialog() {
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    }
+    function closeDialog() {
+      if (typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+      pendingButton = null;
+    }
+
+    cancelBtn.addEventListener("click", closeDialog);
+    dialog.addEventListener("click", function (e) {
+      if (e.target === dialog) closeDialog(); // backdrop click
+    });
+    okBtn.addEventListener("click", function () {
+      var btn = pendingButton;
+      closeDialog();
+      if (btn) {
+        bypassNext = true;
+        btn.click(); // re-dispatch; the capture listener below lets this one through
+      }
+    });
+
+    document.addEventListener(
+      "click",
+      function (e) {
+        if (bypassNext) { bypassNext = false; return; }
+        var btn = e.target.closest ? e.target.closest("button") : null;
+        if (!btn || btn.textContent.trim() !== "Save") return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        pendingButton = btn;
+        openDialog();
+      },
+      true // capture phase — must run before Decap's own bubble-phase handler
+    );
   })();
   </script>
 </body>
