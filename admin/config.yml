@@ -2,8 +2,8 @@ backend:
   name: github
   repo: steven-the-qa/door-county-volunteer-hub
   branch: main
-  auth_endpoint: https://dcvh-cms-auth.docovolunteerhub.workers.dev/auth
   base_url: https://dcvh-cms-auth.docovolunteerhub.workers.dev
+  auth_endpoint: auth # Decap builds the real URL as {{base_url}}/{{auth_endpoint}}
 
 # Every save opens a GitHub pull request instead of committing straight to
 # main — review the diff there and merge only once you've confirmed the
