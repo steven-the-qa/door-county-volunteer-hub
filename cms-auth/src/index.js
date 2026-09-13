@@ -89,9 +89,11 @@ function readCookie(cookieHeader, name) {
   return match ? match.slice(name.length + 1) : null;
 }
 
-// Builds the exact postMessage handshake Decap's GitHub backend expects:
-// the popup waits for the opener to ping it, then replies once with the
-// "authorization:github:<status>:<json>" string.
+// Sends Decap's expected "authorization:github:<status>:<json>" string to the
+// opener (the /admin tab). Decap's listener reacts to this message directly —
+// it doesn't require a prior handshake — but the *first* send can race with
+// Decap still wiring up its own listener right after opening the popup, so
+// this retries for a few seconds instead of firing once and giving up.
 function messagePage(status, payload, setCookie) {
   const message = `authorization:github:${status}:${JSON.stringify(payload)}`;
   const humanNote = status === "success" ? "You're logged in — this window will close." : `Login failed: ${payload.message}`;
@@ -100,17 +102,21 @@ function messagePage(status, payload, setCookie) {
 <html>
 <body>
   <p>${escapeHtml(humanNote)}</p>
-  <p>If this window doesn't close on its own, you can close it and return to the admin tab.</p>
+  <p>If this window is still open after a few seconds, close it and try logging in again from the admin tab.</p>
   <script>
   (function () {
     var message = ${JSON.stringify(message)};
-    function receiveMessage(e) {
-      if (!window.opener) return;
-      window.opener.postMessage(message, e.origin);
-      window.removeEventListener("message", receiveMessage, false);
+    var attempts = 0;
+    function send() {
+      attempts += 1;
+      if (window.opener) {
+        try { window.opener.postMessage(message, "*"); } catch (e) {}
+      }
+      if (attempts < 20) {
+        setTimeout(send, 500);
+      }
     }
-    window.addEventListener("message", receiveMessage, false);
-    if (window.opener) window.opener.postMessage("authorizing:github", "*");
+    send();
   })();
   </script>
 </body>
