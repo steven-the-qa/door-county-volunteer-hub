@@ -212,7 +212,66 @@
   </style>
 </head>
 <body>
+  <script>
+  // Decap normally auto-initializes (fetches config.yml, mounts) the instant
+  // its own script tag finishes loading. Registering a custom widget has to
+  // happen BEFORE that mount, or Decap won't know the "orgid" widget type
+  // exists yet when it builds the Organization ID field. Manual init defers
+  // mounting until we explicitly call CMS.init() below, after registering.
+  window.CMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+  // Custom widget: Organization ID as a text input with autocomplete
+  // suggestions instead of a bare free-text field. Decap's documented
+  // widget Control API only receives this field's own value/config — no
+  // "entry" prop, no way to read the live Organizations list as you edit
+  // it (checked directly against Decap's docs before building this any
+  // other way). So this can't validate against or read the sibling list
+  // live; what it CAN do is suggest known orgs via a native <datalist>,
+  // which meaningfully cuts typo risk on existing orgs (pick instead of
+  // recall-and-type) while still allowing a brand-new org's slug to be
+  // typed freely in the same session. The CI check on the pull request
+  // remains the actual safety net either way, same as before this existed.
+  //
+  // The suggestion list is field.options in config.yml -- the exact same
+  // mechanism the built-in Categories select already uses, kept in sync by
+  // hand when a new org is permanently added, same maintenance shape as
+  // that existing gotcha, not a new kind of chore.
+  (function () {
+    var OrgIdControl = createClass({
+      render: function () {
+        var field = this.props.field;
+        var raw = field && field.get ? field.get("options") : null;
+        var options = Array.isArray(raw) ? raw : (raw && typeof raw.toJS === "function" ? raw.toJS() : []);
+        var listId = this.props.forID + "-list";
+
+        return h("span", {}, [
+          h("input", {
+            key: "input",
+            id: this.props.forID,
+            className: this.props.classNameWrapper,
+            type: "text",
+            list: listId,
+            autoComplete: "off",
+            value: this.props.value || "",
+            onChange: (e) => this.props.onChange(e.target.value),
+          }),
+          h(
+            "datalist",
+            { key: "datalist", id: listId },
+            options.map(function (opt) {
+              return h("option", { key: String(opt), value: String(opt) });
+            })
+          ),
+        ]);
+      },
+    });
+
+    CMS.registerWidget("orgid", OrgIdControl);
+    CMS.init();
+  })();
+  </script>
   <script>
   // Everything below is added via script, and only after decap-cms.js above
   // has already run — Decap takes over <body> on mount, so anything

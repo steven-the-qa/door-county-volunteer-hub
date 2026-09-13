@@ -93,11 +93,18 @@ collections:
                 pattern: ["^[a-z0-9-]+$", "Lowercase letters, numbers, and hyphens only"]
               - label: "Organization ID"
                 name: "orgId"
-                widget: "string"
+                widget: "orgid"
                 hint: >
-                  Must exactly match an ID in the Organizations list above.
-                  A typo here fails the automated check on this PR — fix and
-                  re-save if that happens.
+                  Start typing to pick a known org, or type a brand-new
+                  slug if you just added one above in this same entry. A
+                  mismatch still fails the automated check on this PR --
+                  fix and re-save if that happens.
+                # Suggestions only -- typing anything else (e.g. a
+                # brand-new org's id) is still allowed. Add a new org here
+                # once it's a permanent partner, kept in sync by hand, same
+                # as the Categories list below.
+                options:
+                  - "open-door-bird-sanctuary"
               - { label: "Title", name: "title", widget: "string" }
               - { label: "Description", name: "description", widget: "text" }
               - label: "Categories"
