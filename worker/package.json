@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Cloudflare Worker that turns the volunteer interest form into two branded Resend emails.",
   "scripts": {
+    "serve": "cd ../ && python3 -m http.server 8000",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail"
