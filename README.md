@@ -2,7 +2,8 @@
 
 A deliberately low-tech website that lists **current, verified volunteer
 opportunities** for nonprofits in Door County, Wisconsin. All opportunity data
-lives in one JSON file. No database, no build step, no framework.
+lives in one JSON file. No database, no framework. The only build step is
+compiling Tailwind CSS, which GitHub Actions does on every deploy.
 
 See [PRD.md](PRD.md) for the full product/technical spec.
 
@@ -21,7 +22,10 @@ See [PRD.md](PRD.md) for the full product/technical spec.
 
 ```
 index.html · about.html · privacy.html   static pages
-app.js · styles.css                      one script, one basic stylesheet — no framework, no build
+app.js                                   one script — no framework
+css/input.css                             Tailwind source: theme tokens + element defaults
+css/site.css                              compiled CSS (gitignored; built locally or in CI)
+package.json                              Tailwind CLI + npm scripts
 data/opportunities.json                  the only file you edit day-to-day (or use /admin)
 data/opportunities.schema.json            reference schema
 scripts/validate.mjs                      node, no dependencies
@@ -137,14 +141,41 @@ also covers the public site's `isLive()` filter (`lib.test.mjs`), the
 Worker's branded email templates (`worker/src/emails.test.mjs`), and the
 OAuth Worker's cookie parsing (`cms-auth/src/index.test.mjs`).
 
+## Styling (Tailwind CSS)
+
+Styles are [Tailwind](https://tailwindcss.com) utility classes written directly
+in the HTML and in `app.js` (see the `CLS` object there). There is no
+hand-written stylesheet: `css/input.css` only defines the colour/font tokens
+(`bg-page`, `bg-header`, `text-muted`, `bg-pine`, …) and a few plain-element
+defaults for headings, paragraphs and lists.
+
+The Tailwind CLI compiles that into `css/site.css`, which the pages link to.
+That file is gitignored. GitHub Actions builds it on every deploy, so the site
+GitHub Pages serves is still just static files.
+
+In `app.js`, always write complete class names (`"bg-pine"`), never pieces
+glued together (`"bg-" + color`). Tailwind finds classes by reading the
+source files as text, so a class it can't see never makes it into the CSS.
+
 ## Local preview
 
-Any static file server works, e.g.:
+One-time: `npm install`. Then:
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
+npm run dev
 ```
+
+This opens http://localhost:8000 and keeps two watchers running:
+
+- **Tailwind** rebuilds `css/site.css` whenever you add or change a class.
+- **[Browser-Sync](https://browsersync.io)** serves the site. CSS changes are
+  pushed into the open page without a reload (an open dialog or the current
+  filters stay put). Changes to `.html`, `.js`, `data/*.json` or `admin/`
+  reload the page. To test on your phone, open the "External" URL it prints
+  (same Wi-Fi network).
+
+Stop it with Ctrl+C. `npm run serve` is still there if you just want a plain
+static server with no reloading (build the CSS first with `npm run build:css`).
 
 Opening `index.html` directly via `file://` will fail to load the JSON (browser
 security) — use a local server.

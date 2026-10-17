@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>About — Door County Volunteer Hub</title>
   <meta name="description" content="How the Door County Volunteer Hub works, and who runs it." />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <a class="absolute -left-[1000px] focus:static focus:m-2 focus:inline-block" href="#main">Skip to content</a>
 
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="index.html">Door County Volunteer Hub</a>
-      <nav aria-label="Primary">
+  <header class="bg-header">
+    <div class="mx-auto flex max-w-[800px] flex-wrap items-center justify-between px-4 py-3">
+      <a class="text-[17px] font-bold text-black no-underline hover:underline focus:underline" href="index.html">Door County Volunteer Hub</a>
+      <nav aria-label="Primary" class="[&_a]:ml-3.5 [&_a]:font-bold [&_a]:text-black [&_a]:no-underline [&_a:hover]:underline [&_a:focus]:underline">
         <a href="about.html" aria-current="page">About</a>
         <a href="privacy.html">Privacy</a>
         <a href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit Opportunities</a>
@@ -21,7 +21,7 @@
     </div>
   </header>
 
-  <main id="main" class="wrap prose">
+  <main id="main" class="mx-auto mt-5 max-w-[800px] border border-line bg-white px-5 pt-2 pb-5 [&_h2]:mt-[22px] [&_h2]:text-[17px]">
     <h1>About</h1>
 
     <h2>Why this exists</h2>
@@ -54,15 +54,15 @@
     <h2>Who runs it</h2>
     <p>The Hub is run by two volunteers.</p>
 
-    <div class="bios">
-      <section class="bio">
-        <h3>Steven</h3>
-        <p class="bio-role">Outreach &amp; opportunities</p>
+    <div class="my-3">
+      <section class="mb-2.5 border border-line px-3.5 py-2.5">
+        <h3 class="mt-0 mb-0.5">Steven</h3>
+        <p class="mt-0 mb-1.5 text-[13px] text-muted">Outreach &amp; opportunities</p>
         <p><em>Bio coming soon.</em></p>
       </section>
-      <section class="bio">
-        <h3>Sam</h3>
-        <p class="bio-role">Volunteer coordination &amp; follow-up</p>
+      <section class="mb-2.5 border border-line px-3.5 py-2.5">
+        <h3 class="mt-0 mb-0.5">Sam</h3>
+        <p class="mt-0 mb-1.5 text-[13px] text-muted">Volunteer coordination &amp; follow-up</p>
         <p><em>Bio coming soon.</em></p>
       </section>
     </div>
@@ -79,8 +79,8 @@
     <p><a href="index.html">← Back to opportunities</a></p>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
+  <footer class="mt-10 border-t border-line bg-[#e8e8e8] text-[13px] text-muted">
+    <div class="mx-auto max-w-[800px] px-4 pt-3.5 pb-[18px]">
       <p>Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
       <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a></p>
     </div>

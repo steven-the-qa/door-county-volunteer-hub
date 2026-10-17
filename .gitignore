@@ -9,3 +9,6 @@ worker/.dev.vars
 worker/.wrangler/
 cms-auth/.dev.vars
 cms-auth/.wrangler/
+
+# Tailwind output (built by `npm run build:css` / CI)
+css/site.css

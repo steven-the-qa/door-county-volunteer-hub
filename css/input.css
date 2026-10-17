@@ -1,0 +1,69 @@
+/* Tailwind source — NOT served directly.
+   `npm run build:css` compiles this into css/site.css (gitignored), which is
+   what the pages link to. CI runs that build before deploying to GitHub Pages.
+   Styling lives as utility classes in the HTML and in app.js; this file only
+   holds the design tokens and a few plain-element defaults. */
+
+/* Only scan the public site — not worker/, cms-auth/, admin/ or docs. */
+@import "tailwindcss" source(none);
+@source "../index.html";
+@source "../about.html";
+@source "../privacy.html";
+@source "../app.js";
+
+@theme {
+  --font-sans: Verdana, Geneva, Arial, sans-serif;
+
+  /* Mobile-first breakpoint matching the old 520px max-width rule. */
+  --breakpoint-xs: 32.5rem;
+
+  --color-page: #008080;        /* page background */
+  --color-header: #eddfff;      /* site header */
+  --color-ink: #222222;         /* body text */
+  --color-muted: #555555;       /* secondary text */
+  --color-line: #cccccc;        /* borders */
+  --color-link: #1a5276;
+  --color-pine: #2e5339;        /* primary button, dialog border */
+  --color-pine-dark: #1f3a28;
+  --color-pine-hover: #24422d;
+
+  /* Loading screen: fade in after a short delay (see index.html). */
+  --animate-fade-in: fade-in 0.2s ease-out 0.3s forwards;
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* Plain-element defaults. Tailwind's reset strips heading sizes, paragraph
+   margins and list bullets; these put back the basics so the About/Privacy
+   prose reads normally without a class on every <p>. */
+@layer base {
+  body {
+    @apply bg-page font-sans text-[15px]/normal text-ink;
+  }
+  a {
+    @apply text-link underline;
+  }
+  h1 {
+    @apply mt-5 mb-2.5 text-[26px] font-bold;
+  }
+  h2 {
+    @apply mb-1.5 text-[19px] font-bold;
+  }
+  h3 {
+    @apply text-[17px] font-bold;
+  }
+  p,
+  ul,
+  ol {
+    @apply my-[1em];
+  }
+  ul {
+    @apply list-disc pl-10;
+  }
+  ol {
+    @apply list-decimal pl-10;
+  }
+}

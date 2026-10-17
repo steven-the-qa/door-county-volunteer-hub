@@ -28,6 +28,8 @@ jobs:
         run: node scripts/validate.mjs
       - name: Unit tests
         run: node --test
+      - name: Tailwind CSS compiles
+        run: npm ci && npm run build:css
 
   deploy:
     needs: validate
@@ -38,8 +40,13 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build Tailwind CSS
+        run: npm ci && npm run build:css
       - name: Stage site (exclude non-site files)
-        run: rm -rf worker cms-auth .github scripts admin/lib.test.mjs lib.test.mjs
+        run: rm -rf worker cms-auth .github scripts admin/lib.test.mjs lib.test.mjs node_modules package.json package-lock.json css/input.css
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
