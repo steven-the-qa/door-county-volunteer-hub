@@ -1,5 +1,9 @@
 /* Door County Volunteer Hub — renders opportunities from data/opportunities.json.
-   No framework, no build step. */
+   No framework. Styling is Tailwind utility classes (see CLS below).
+   Loaded as a module (<script type="module">) so this import is guaranteed
+   to be ready before any code below runs. */
+
+import { isLive as isLiveOn } from "./lib.js";
 
 (function () {
   "use strict";
@@ -9,6 +13,25 @@
   var WORKER_ENDPOINT = "https://dcvh-form.docovolunteerhub.workers.dev";
 
   var DATA_URL = "data/opportunities.json";
+
+  // Tailwind utility classes for elements this script creates or restyles.
+  // Keep them as complete literal strings: Tailwind finds classes by scanning
+  // this file, so never build a class name by concatenating pieces.
+  var CLS = {
+    card: "mb-3.5 border border-line bg-white p-4",
+    title: "mt-0",
+    org: "mt-0 mb-2.5 font-bold text-muted",
+    desc: "mt-0 mb-3",
+    dl: "mt-0 mb-3 text-sm",
+    dt: "font-bold text-muted xs:float-left xs:clear-left xs:w-[110px]",
+    dd: "mb-2 xs:mb-0.5 xs:pl-[120px]",
+    tags: "mt-0 mb-3 list-none p-0",
+    tag: "mr-1 inline-block border border-line bg-[#eeeeee] px-1.5 py-px text-xs",
+    button: "cursor-pointer border border-pine-dark bg-pine px-3.5 py-[7px] text-sm font-bold text-white hover:bg-pine-hover",
+    statusBase: "my-2.5 border px-2.5 py-2",
+    statusOk: "border-pine bg-[#e6f0e8]",
+    statusError: "border-[#b33] bg-[#fbe3e3]"
+  };
 
   var COMMITMENT_LABEL = {
     "one-time": "One-time",
@@ -26,6 +49,8 @@
   var catSelect = document.getElementById("filter-category");
   var commitSelect = document.getElementById("filter-commitment");
   var resetBtn = document.getElementById("filter-reset");
+  var filtersEl = document.getElementById("filters");
+  var loadingEl = document.getElementById("page-loading");
 
   var dialog = document.getElementById("interest-dialog");
   var form = document.getElementById("interest-form");
@@ -48,7 +73,7 @@
   // today's date, since that function takes "today" as a plain argument
   // instead of reading the clock itself, to stay testable.
   function isLive(op) {
-    return window.DCVHSiteLib.isLive(op, todayISO());
+    return isLiveOn(op, todayISO());
   }
 
   function el(tag, props, children) {
@@ -89,14 +114,14 @@
     var org = state.orgs[op.orgId] || { name: "Unknown organization" };
 
     var orgLine = org.website
-      ? el("p", { class: "org" }, [el("a", { href: org.website, rel: "noopener", target: "_blank" }, [org.name])])
-      : el("p", { class: "org", text: org.name });
+      ? el("p", { class: CLS.org }, [el("a", { href: org.website, rel: "noopener", target: "_blank" }, [org.name])])
+      : el("p", { class: CLS.org, text: org.name });
 
-    var dl = el("dl", {}, []);
+    var dl = el("dl", { class: CLS.dl }, []);
     function row(term, value) {
       if (!value && value !== 0) return;
-      dl.appendChild(el("dt", { text: term }));
-      dl.appendChild(el("dd", { text: String(value) }));
+      dl.appendChild(el("dt", { class: CLS.dt, text: term }));
+      dl.appendChild(el("dd", { class: CLS.dd, text: String(value) }));
     }
     row("Commitment", COMMITMENT_LABEL[op.commitment] || op.commitment);
     row("When", op.schedule);
@@ -104,17 +129,17 @@
     if (op.minAge) row("Minimum age", op.minAge);
     row("Posted", op.postedDate);
 
-    var tags = el("ul", { class: "tags" }, (op.categories || []).map(function (c) {
-      return el("li", { class: "tag", text: c });
+    var tags = el("ul", { class: CLS.tags }, (op.categories || []).map(function (c) {
+      return el("li", { class: CLS.tag, text: c });
     }));
 
-    var btn = el("button", { type: "button", class: "primary" }, ["Express interest"]);
+    var btn = el("button", { type: "button", class: CLS.button }, ["Express interest"]);
     btn.addEventListener("click", function () { openDialog(op, org); });
 
-    var card = el("li", { class: "card", id: op.id }, [
-      el("h2", { text: op.title }),
+    var card = el("li", { class: CLS.card, id: op.id }, [
+      el("h2", { class: CLS.title, text: op.title }),
       orgLine,
-      el("p", { class: "desc", text: op.description }),
+      el("p", { class: CLS.desc, text: op.description }),
       dl
     ]);
     if ((op.categories || []).length) card.appendChild(tags);
@@ -172,7 +197,7 @@
   function openDialog(op, org) {
     form.reset();
     formStatus.hidden = true;
-    formStatus.className = "form-status";
+    formStatus.className = CLS.statusBase + " border-line";
     submitBtn.disabled = false;
     submitBtn.hidden = false;
     submitBtn.textContent = "Send";
@@ -198,7 +223,7 @@
 
   function showStatus(kind, message) {
     formStatus.hidden = false;
-    formStatus.className = "form-status " + kind;
+    formStatus.className = CLS.statusBase + " " + (kind === "error" ? CLS.statusError : CLS.statusOk);
     formStatus.textContent = message;
   }
 
@@ -262,6 +287,8 @@
     populateFilters(data);
     readFiltersFromURL();
     applyFilters();
+    filtersEl.hidden = false;
+    loadingEl.hidden = true;
 
     [orgSelect, catSelect, commitSelect].forEach(function (s) {
       s.addEventListener("change", applyFilters);
@@ -278,17 +305,34 @@
     });
   }
 
+  function showLoadError() {
+    loadingEl.hidden = true;
+    listEl.hidden = true;
+    countEl.hidden = true;
+    filtersEl.hidden = true;
+    errorEl.hidden = false;
+  }
+
+  // Download/parse failures and bugs in our own rendering code are logged
+  // separately, so the console says which one happened. Visitors see the
+  // same "couldn't load" box either way.
   fetch(DATA_URL, { cache: "no-cache" })
     .then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     })
-    .then(init)
-    .catch(function (err) {
-      console.error("Failed to load opportunities:", err);
-      listEl.hidden = true;
-      countEl.hidden = true;
-      document.querySelector(".filters").hidden = true;
-      errorEl.hidden = false;
-    });
+    .then(
+      function (data) {
+        try {
+          init(data);
+        } catch (err) {
+          console.error("Opportunities loaded, but rendering them failed:", err);
+          showLoadError();
+        }
+      },
+      function (err) {
+        console.error("Failed to download or parse " + DATA_URL + ":", err);
+        showLoadError();
+      }
+    );
 })();

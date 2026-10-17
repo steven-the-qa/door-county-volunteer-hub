@@ -1,0 +1,19 @@
+{
+  "name": "door-county-volunteer-hub",
+  "private": true,
+  "description": "Static site for GitHub Pages. The only build step is compiling Tailwind CSS.",
+  "scripts": {
+    "dev": "concurrently --kill-others --names css,web --prefix-colors cyan,green \"npm:watch:css\" \"npm:serve:dev\"",
+    "build:css": "tailwindcss -i css/input.css -o css/site.css --minify",
+    "watch:css": "tailwindcss -i css/input.css -o css/site.css --watch",
+    "serve:dev": "browser-sync start --server --port 8000 --files \"css/site.css\" \"*.html\" \"*.js\" \"data/*.json\" \"admin/**/*\" --no-notify --no-ui",
+    "serve": "python3 -m http.server 8000",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "browser-sync": "3.0.4",
+    "concurrently": "10.0.6",
+    "tailwindcss": "4.3.3"
+  }
+}
