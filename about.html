@@ -3,87 +3,110 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>About — Door County Volunteer Hub</title>
-  <meta name="description" content="How the Door County Volunteer Hub works, and who runs it." />
+  <title>About Us — Door County Volunteer Hub</title>
+  <meta name="description" content="Why the Door County Volunteer Hub exists, how it works, who runs it, and how to get in touch." />
+  <link rel="preload" href="fonts/isometra-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
   <a class="absolute -left-[1000px] focus:static focus:m-2 focus:inline-block" href="#main">Skip to content</a>
 
-  <header class="bg-header">
-    <div class="mx-auto flex max-w-[800px] flex-wrap items-center justify-between px-4 py-3">
-      <a class="text-[17px] font-bold text-black no-underline hover:underline focus:underline" href="index.html">Door County Volunteer Hub</a>
-      <nav aria-label="Primary" class="[&_a]:ml-3.5 [&_a]:font-bold [&_a]:text-black [&_a]:no-underline [&_a:hover]:underline [&_a:focus]:underline">
-        <a href="about.html" aria-current="page">About</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit Opportunities</a>
+  <header class="border-b border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-[18px]">
+      <a class="font-display text-xl/[1.1] text-accent no-underline sm:text-2xl/[1.1]" href="index.html">Door County<br />Volunteer Hub</a>
+      <nav aria-label="Primary" class="hidden items-center gap-2 sm:flex">
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent bg-tint px-4 font-bold text-accent no-underline" href="about.html" aria-current="page">About Us</a>
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent px-4 font-bold text-accent no-underline hover:bg-tint" href="index.html#organizations">For Organizations</a>
       </nav>
+      <button type="button" id="menu-button" aria-expanded="false" aria-controls="mobile-menu" class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-btn border-2 border-accent bg-white px-3.5 font-bold text-accent sm:hidden">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+        Menu
+      </button>
     </div>
+    <nav id="mobile-menu" aria-label="Primary" class="flex flex-col border-t border-line px-5 pt-1 pb-3 sm:hidden" hidden>
+      <a class="flex min-h-13 items-center border-b border-line font-bold text-accent no-underline" href="about.html" aria-current="page">About Us</a>
+      <a class="flex min-h-13 items-center font-bold text-accent no-underline" href="index.html#organizations">For Organizations</a>
+    </nav>
   </header>
 
-  <main id="main" class="mx-auto mt-5 max-w-[800px] border border-line bg-white px-5 pt-2 pb-5 [&_h2]:mt-[22px] [&_h2]:text-[17px]">
-    <h1>About</h1>
+  <main id="main">
+    <div class="mx-auto max-w-[760px] px-5 pt-9 pb-13 sm:px-8 sm:pt-14 sm:pb-20 [&_h2]:mt-11 [&_h2]:mb-3 [&_h2]:font-display [&_h2]:text-[26px] [&_h2]:font-normal sm:[&_h2]:text-[32px] [&_li]:mb-1.5 [&_p]:text-body">
+      <h1 class="m-0 font-display text-[38px]/[1.05] font-normal sm:text-5xl/[1.05]">About us</h1>
+      <p class="text-lg sm:text-xl">
+        The Door County Volunteer Hub is a short, verified list of what local
+        nonprofits need help with right now, run by two volunteers.
+      </p>
 
-    <h2>Why this exists</h2>
-    <p>
-      We kept running into the same problem: we wanted to volunteer in Door County,
-      but it was hard to figure out who needed help and how to start. Forms and
-      emails went unanswered. Websites listed openings that were years out of date.
-      Often the only way in was knowing someone who already volunteered there.
-    </p>
-    <p>
-      Meanwhile, nearly every organization we talked to said they were short on
-      volunteers — especially younger ones.
-    </p>
+      <h2>Why this exists</h2>
+      <p>
+        We kept running into the same problem: we wanted to volunteer in Door County,
+        but it was hard to figure out who needed help and how to start. Forms and
+        emails went unanswered. Websites listed openings that were years out of date.
+        Often the only way in was knowing someone who already volunteered there.
+      </p>
+      <p>
+        Meanwhile, nearly every organization we talked to said they were short on
+        volunteers — especially younger ones.
+      </p>
 
-    <h2>How it works</h2>
-    <ol>
-      <li>Local nonprofits tell us what they need help with.</li>
-      <li>We confirm the details and post <strong>verified, current</strong> opportunities here.</li>
-      <li>You find something that fits and send us your name and email.</li>
-      <li>
-        Sam personally emails you within about two business days and introduces you
-        to the right person at the organization.
-      </li>
-    </ol>
-    <p>
-      That's it. No account, no long application, no volunteer database. When an
-      opportunity is filled or expires, it comes off the list.
-    </p>
+      <h2>How it works</h2>
+      <ol>
+        <li>Local nonprofits tell us what they need help with.</li>
+        <li>We confirm the details and post <strong>verified, current</strong> opportunities here.</li>
+        <li>You find something that fits and send us your name and email.</li>
+        <li>Sam personally emails you within about two business days and introduces you to the right person at the organization.</li>
+      </ol>
+      <p>
+        That's it. No account, no long application, no volunteer database. When an
+        opportunity is filled or expires, it comes off the list.
+      </p>
+      <p><a class="font-bold" href="opportunities.html">See current opportunities</a></p>
 
-    <h2>Who runs it</h2>
-    <p>The Hub is run by two volunteers.</p>
+      <h2>Who runs it</h2>
+      <p>The Hub is run by two volunteers.</p>
+      <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <section class="rounded-[14px] border border-line p-5">
+          <h3 class="m-0 text-xl font-bold">Steven</h3>
+          <p class="mt-1 mb-3 text-[15px] font-bold text-accent">Outreach &amp; opportunities</p>
+          <p class="m-0"><em>Bio coming soon.</em></p>
+        </section>
+        <section class="rounded-[14px] border border-line p-5">
+          <h3 class="m-0 text-xl font-bold">Sam</h3>
+          <p class="mt-1 mb-3 text-[15px] font-bold text-accent">Volunteer coordination &amp; follow-up</p>
+          <p class="m-0"><em>Bio coming soon.</em></p>
+        </section>
+      </div>
 
-    <div class="my-3">
-      <section class="mb-2.5 border border-line px-3.5 py-2.5">
-        <h3 class="mt-0 mb-0.5">Steven</h3>
-        <p class="mt-0 mb-1.5 text-[13px] text-muted">Outreach &amp; opportunities</p>
-        <p><em>Bio coming soon.</em></p>
-      </section>
-      <section class="mb-2.5 border border-line px-3.5 py-2.5">
-        <h3 class="mt-0 mb-0.5">Sam</h3>
-        <p class="mt-0 mb-1.5 text-[13px] text-muted">Volunteer coordination &amp; follow-up</p>
-        <p><em>Bio coming soon.</em></p>
-      </section>
+      <h2 id="organizations">For organizations</h2>
+      <p>
+        If your nonprofit needs help sourcing or coordinating volunteers, we'd love to
+        hear from you. We can post your opportunities here and, if it's useful, act as
+        your first point of contact for new volunteers.
+        <a href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit an opportunity</a>
+        and we'll follow up to confirm the details before posting it.
+      </p>
+
+      <h2 id="contact">Get in touch</h2>
+      <div class="rounded-[14px] bg-tint p-5 sm:p-6">
+        <p class="mt-0">Questions, ideas, or want to help out with the Hub itself? Email us — a real person reads every message.</p>
+        <p class="mb-0">
+          <a class="inline-flex min-h-12 items-center rounded-btn bg-accent px-5.5 font-bold text-white no-underline hover:bg-accent-dark hover:text-white" href="mailto:team@docovolunteerhub.com">team@docovolunteerhub.com</a>
+        </p>
+      </div>
+      <p class="text-[15px]">
+        Already sent us your details and want them deleted? See our
+        <a href="privacy.html">privacy page</a>.
+      </p>
     </div>
-
-    <h2>For organizations</h2>
-    <p>
-      If your nonprofit needs help sourcing or coordinating volunteers, we'd love to
-      hear from you. We can post your opportunities here and, if it's useful, act as
-      your first point of contact for new volunteers.
-      <a href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit an opportunity</a>
-      and we'll follow up to confirm the details before posting it.
-    </p>
-
-    <p><a href="index.html">← Back to opportunities</a></p>
   </main>
 
-  <footer class="mt-10 border-t border-line bg-[#e8e8e8] text-[13px] text-muted">
-    <div class="mx-auto max-w-[800px] px-4 pt-3.5 pb-[18px]">
-      <p>Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
-      <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a></p>
+  <footer class="border-t border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-4 px-5 py-8 text-[15px] text-muted sm:px-8">
+      <p class="m-0">Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
+      <p class="m-0 flex gap-4"><a href="opportunities.html">Opportunities</a><a href="about.html" aria-current="page">About Us</a><a href="privacy.html">Privacy</a></p>
     </div>
   </footer>
+
+  <script src="site.js"></script>
 </body>
 </html>

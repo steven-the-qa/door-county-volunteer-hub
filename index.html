@@ -5,133 +5,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Door County Volunteer Hub</title>
   <meta name="description" content="Current, verified volunteer opportunities with nonprofits in Door County, Wisconsin." />
+  <link rel="preload" href="fonts/isometra-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
   <!-- Full-screen loading screen, shown from the first paint until app.js has
        the data (or gives up). The spinner and text fade in after 0.3s, so a
-       fast load shows only a brief solid-colour screen, not a flicker. -->
-  <div id="page-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-page text-white" role="status">
+       fast load shows only a brief blank screen, not a flicker. -->
+  <div id="page-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white text-ink" role="status">
     <div class="flex animate-fade-in flex-col items-center gap-4 opacity-0 motion-reduce:animate-none motion-reduce:opacity-100">
-      <div class="size-10 animate-spin rounded-full border-4 border-white/30 border-t-white motion-reduce:animate-none" aria-hidden="true"></div>
+      <div class="size-10 animate-spin rounded-full border-4 border-accent/25 border-t-accent motion-reduce:animate-none" aria-hidden="true"></div>
       <p class="m-0 text-lg font-bold">Loading opportunities…</p>
     </div>
   </div>
 
-  <a class="absolute -left-[1000px] focus:static focus:m-2 focus:inline-block" href="#opportunities">Skip to opportunities</a>
+  <a class="absolute -left-[1000px] focus:static focus:m-2 focus:inline-block" href="#main">Skip to content</a>
 
-  <header class="bg-header">
-    <div class="mx-auto flex max-w-[800px] flex-wrap items-center justify-between px-4 py-3">
-      <a class="text-[17px] font-bold text-black no-underline hover:underline focus:underline" href="index.html">Door County Volunteer Hub</a>
-      <nav aria-label="Primary" class="[&_a]:ml-3.5 [&_a]:font-bold [&_a]:text-black [&_a]:no-underline [&_a:hover]:underline [&_a:focus]:underline">
-        <a href="about.html">About</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit Opportunities</a>
+  <header class="border-b border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-[18px]">
+      <a class="font-display text-xl/[1.1] text-accent no-underline sm:text-2xl/[1.1]" href="index.html">Door County<br />Volunteer Hub</a>
+      <nav aria-label="Primary" class="hidden items-center gap-2 sm:flex">
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent px-4 font-bold text-accent no-underline hover:bg-tint" href="about.html">About Us</a>
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent px-4 font-bold text-accent no-underline hover:bg-tint" href="#organizations">For Organizations</a>
       </nav>
+      <button type="button" id="menu-button" aria-expanded="false" aria-controls="mobile-menu" class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-btn border-2 border-accent bg-white px-3.5 font-bold text-accent sm:hidden">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+        Menu
+      </button>
     </div>
+    <nav id="mobile-menu" aria-label="Primary" class="flex flex-col border-t border-line px-5 pt-1 pb-3 sm:hidden" hidden>
+      <a class="flex min-h-13 items-center border-b border-line font-bold text-accent no-underline" href="about.html">About Us</a>
+      <a class="flex min-h-13 items-center font-bold text-accent no-underline" href="#organizations">For Organizations</a>
+    </nav>
   </header>
 
-  <main class="mx-auto max-w-[800px] px-4">
-    <section class="text-white">
-      <h1>Volunteer Opportunities in Door County</h1>
-      <p>
-        A short, verified list of what local nonprofits need help with right now.
-        Find something that fits, send your name and email, and a real person
-        (Sam) will connect you with the organization within about two business days.
-      </p>
-      <p id="demo-banner" class="my-3 border border-[#e0c97f] bg-page px-3 py-2.5" hidden>
-        Heads up: this list is showing <strong>test data</strong> only — none of these
-        are real opportunities. Real listings are coming soon.
-      </p>
+  <main id="main">
+    <section>
+      <div class="mx-auto flex max-w-[1200px] flex-wrap items-center gap-5 px-5 pt-9 pb-11 sm:gap-14 sm:px-8 sm:pt-[88px] sm:pb-24">
+        <div class="flex min-w-0 flex-[1_1_520px] flex-col gap-5 sm:gap-6">
+          <p class="m-0 text-[15px] font-bold tracking-[0.12em] text-accent uppercase">Door County, Wisconsin</p>
+          <h1 class="m-0 font-display text-[38px]/[1.02] font-normal sm:text-[56px]/[1.02] lg:text-[68px]/[1.02]">Find where you're needed in Door County.</h1>
+          <p class="m-0 max-w-[560px] text-lg text-body sm:text-xl">A short, verified list of what local nonprofits need help with right now. Pick something that fits, send your name and email, and a real person will connect you within about two business days.</p>
+          <div class="pt-2">
+            <a class="inline-flex min-h-13 w-full items-center justify-center rounded-btn bg-accent px-6.5 text-lg font-bold text-white no-underline hover:bg-accent-dark hover:text-white sm:w-auto" href="#current">Find Volunteering Opportunities</a>
+          </div>
+          <p class="m-0 text-[15px] text-muted">Every listing is confirmed with the organization before it goes up.</p>
+        </div>
+        <div class="hidden min-w-0 flex-[1_1_380px] justify-center sm:flex">
+          <!-- Isometric cubes, echoing Isometra's 60° grid. Decorative only. -->
+          <svg width="420" height="420" viewBox="-210 -210 420 420" aria-hidden="true" class="h-auto max-w-full">
+            <defs>
+              <pattern id="iso-grid" width="34.64" height="60" patternUnits="userSpaceOnUse">
+                <path d="M0 0 L34.64 60 M34.64 0 L0 60 M0 30 L34.64 30" stroke="#cde7ea" stroke-width="1" fill="none" />
+              </pattern>
+              <g id="cube">
+                <polygon points="0,-60 52,-30 0,0 -52,-30" fill="#33cddb" />
+                <polygon points="-52,-30 0,0 0,60 -52,30" fill="#00838f" />
+                <polygon points="52,-30 0,0 0,60 52,30" fill="#005c64" />
+              </g>
+            </defs>
+            <circle cx="0" cy="0" r="200" fill="url(#iso-grid)" />
+            <use href="#cube" x="0" y="-30" />
+            <use href="#cube" x="0" y="-90" />
+            <use href="#cube" x="-52" y="0" />
+            <use href="#cube" x="52" y="0" />
+            <use href="#cube" x="-104" y="30" />
+            <use href="#cube" x="0" y="30" />
+            <use href="#cube" x="104" y="30" />
+          </svg>
+        </div>
+      </div>
     </section>
 
-    <!-- Hidden until the data loads: the dropdowns are filled in from the JSON. -->
-    <section id="filters" class="mb-4 border border-line bg-white p-3" aria-label="Filter opportunities" hidden>
-      <div class="mb-1.5 block xs:mr-3.5 xs:inline-block">
-        <label class="mb-0.5 block text-[13px] font-bold" for="filter-org">Organization</label>
-        <select class="w-full border border-[#999999] bg-white p-1 text-sm xs:w-auto" id="filter-org"><option value="">All organizations</option></select>
+    <section id="current" class="border-t border-line" aria-labelledby="current-heading">
+      <div class="mx-auto flex max-w-[1200px] flex-col gap-7 px-5 pt-11 pb-13 sm:px-8 sm:py-20">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div class="flex flex-col gap-2">
+            <h2 id="current-heading" class="m-0 font-display text-[28px] font-normal sm:text-[40px]">Current volunteer opportunities</h2>
+            <p id="result-count" class="m-0 text-body" aria-live="polite"></p>
+          </div>
+          <!-- Carousel arrows: desktop only. On phones the cards stack. -->
+          <div id="carousel-arrows" class="hidden gap-2.5 sm:flex">
+            <button type="button" id="carousel-prev" aria-label="Previous opportunities" class="inline-flex size-12 cursor-pointer items-center justify-center rounded-btn border-2 border-accent bg-white text-accent hover:bg-tint">
+              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M13 4l-6 6 6 6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <button type="button" id="carousel-next" aria-label="Next opportunities" class="inline-flex size-12 cursor-pointer items-center justify-center rounded-btn border-2 border-accent bg-white text-accent hover:bg-tint">
+              <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4l6 6-6 6" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <p id="demo-banner" class="m-0 rounded-[14px] border border-[#e0c97f] bg-[#fff8e1] px-4 py-3 text-text" hidden>
+          Heads up: this list is showing <strong>test data</strong> only — none of these
+          are real opportunities. Real listings are coming soon.
+        </p>
+
+        <!-- Stacked list on phones; a horizontal, snap-scrolling carousel from 640px.
+             app.js inserts the cards before the "See more" link. -->
+        <div id="carousel" role="region" aria-label="Current volunteer opportunities" tabindex="0" class="flex flex-col gap-4 sm:-mx-1 sm:snap-x sm:snap-mandatory sm:flex-row sm:gap-6 sm:overflow-x-auto sm:scroll-smooth sm:scroll-px-1 sm:px-1 sm:pb-5">
+          <a id="see-more" href="opportunities.html" class="flex min-h-14 items-center justify-center gap-4 rounded-btn border-2 border-accent bg-white px-5 text-center font-bold text-accent no-underline hover:bg-tint sm:min-h-0 sm:flex-[0_0_300px] sm:snap-start sm:flex-col sm:rounded-[14px] sm:border-dashed sm:p-7">
+            <span class="hidden size-14 items-center justify-center rounded-btn bg-accent sm:inline-flex" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 20 20"><path d="M4 10h12M11 5l5 5-5 5" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+            <span class="text-lg/[1.2] sm:text-[23px]/[1.2] sm:text-ink">See more opportunities</span>
+            <span class="hidden text-[15px] font-normal text-body sm:block">Browse and filter every open listing</span>
+          </a>
+        </div>
+
+        <p id="empty-state" class="m-0 rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body" hidden>
+          There are no open opportunities right now. Check back soon.
+        </p>
+        <div id="load-error" class="rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body" hidden>
+          <p class="m-0">We couldn't load the opportunity list right now. Please refresh the page or check back soon.</p>
+        </div>
+        <noscript>
+          <style>#page-loading { display: none; }</style>
+          <p class="m-0 rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body">This list needs JavaScript to load. Please enable JavaScript and refresh.</p>
+        </noscript>
       </div>
-      <div class="mb-1.5 block xs:mr-3.5 xs:inline-block">
-        <label class="mb-0.5 block text-[13px] font-bold" for="filter-category">Category</label>
-        <select class="w-full border border-[#999999] bg-white p-1 text-sm xs:w-auto" id="filter-category"><option value="">All categories</option></select>
-      </div>
-      <div class="mb-1.5 block xs:mr-3.5 xs:inline-block">
-        <label class="mb-0.5 block text-[13px] font-bold" for="filter-commitment">Commitment</label>
-        <select class="w-full border border-[#999999] bg-white p-1 text-sm xs:w-auto" id="filter-commitment">
-          <option value="">Any commitment</option>
-          <option value="one-time">One-time</option>
-          <option value="recurring">Recurring</option>
-          <option value="flexible">Flexible</option>
-        </select>
-      </div>
-      <button type="button" id="filter-reset" class="cursor-pointer py-1 text-sm text-link underline">Reset</button>
     </section>
 
-    <p id="result-count" class="mt-3 mb-2 text-[13px] text-white" aria-live="polite"></p>
-
-    <section id="opportunities" aria-label="Opportunities">
-      <ol id="opportunity-list" class="m-0 list-none p-0"></ol>
-
-      <p id="empty-state" class="border border-dashed border-[#aaaaaa] bg-white p-5 text-center text-muted" hidden>
-        No opportunities match those filters right now.
-      </p>
-
-      <div id="load-error" class="border border-dashed border-[#aaaaaa] bg-white p-5 text-center text-muted" hidden>
-        <p>We couldn't load the opportunity list right now. Please refresh the page or check back soon.</p>
+    <section id="organizations" class="bg-accent text-white" aria-labelledby="organizations-heading">
+      <div class="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-8 px-5 py-11 sm:px-8 sm:py-[72px]">
+        <div class="flex min-w-0 flex-[1_1_520px] flex-col gap-3">
+          <h2 id="organizations-heading" class="m-0 font-display text-[28px] font-normal text-white sm:text-[40px]">For organizations</h2>
+          <p class="m-0 max-w-[620px] text-lg sm:text-xl">Short on volunteers? Tell us what you need. We confirm the details, post it here, and can be your first point of contact for new volunteers.</p>
+        </div>
+        <a class="inline-flex min-h-13 w-full items-center justify-center rounded-btn bg-white px-6.5 text-lg font-bold text-accent no-underline hover:bg-tint hover:text-accent-dark sm:w-auto" href="https://forms.gle/g5eD31zjfcUUQbii9" target="_blank" rel="noopener">Submit an opportunity</a>
       </div>
-
-      <noscript>
-        <style>#page-loading { display: none; }</style>
-        <p class="border border-dashed border-[#aaaaaa] bg-white p-5 text-center text-muted">This list needs JavaScript to load. Please enable JavaScript and refresh.</p>
-      </noscript>
     </section>
   </main>
 
-  <dialog id="interest-dialog" class="m-auto w-[90%] max-w-[420px] border-2 border-pine p-0 backdrop:bg-black/50">
-    <form id="interest-form" method="dialog" class="p-[18px]">
-      <h2>Express interest</h2>
-      <p class="mt-0 text-[#444444]">
+  <dialog id="interest-dialog" class="m-auto w-[calc(100%-2rem)] max-w-[440px] rounded-[14px] border-0 p-0 shadow-xl backdrop:bg-black/50">
+    <form id="interest-form" method="dialog" class="p-6">
+      <h2 class="mt-0 mb-2 text-2xl font-bold">Express interest</h2>
+      <p class="mt-0 text-body">
         You're interested in <strong id="dialog-opportunity">this opportunity</strong>
         at <strong id="dialog-org">the organization</strong>.
       </p>
 
-      <div class="mb-2.5">
-        <label class="mb-0.5 block text-[13px] font-bold" for="f-first">First name</label>
-        <input class="w-full border border-[#999999] bg-white p-1 text-sm" id="f-first" name="firstName" type="text" autocomplete="given-name" required />
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-first">First name</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-first" name="firstName" type="text" autocomplete="given-name" required />
       </div>
-      <div class="mb-2.5">
-        <label class="mb-0.5 block text-[13px] font-bold" for="f-last">Last name</label>
-        <input class="w-full border border-[#999999] bg-white p-1 text-sm" id="f-last" name="lastName" type="text" autocomplete="family-name" required />
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-last">Last name</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-last" name="lastName" type="text" autocomplete="family-name" required />
       </div>
-      <div class="mb-2.5">
-        <label class="mb-0.5 block text-[13px] font-bold" for="f-email">Email</label>
-        <input class="w-full border border-[#999999] bg-white p-1 text-sm" id="f-email" name="email" type="email" autocomplete="email" required />
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-email">Email</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-email" name="email" type="email" autocomplete="email" required />
       </div>
 
       <!-- honeypot: real people leave this empty -->
       <input type="text" name="company" tabindex="-1" autocomplete="off" class="absolute! -left-[9999px]! h-px w-px overflow-hidden" aria-hidden="true" />
 
-      <p class="text-xs text-muted">
+      <p class="text-sm text-muted">
         By submitting, you agree we can share your name and email with this
         organization so they can follow up about volunteering.
       </p>
 
-      <p id="form-status" class="my-2.5 border border-line px-2.5 py-2" role="status" aria-live="polite" hidden></p>
+      <p id="form-status" class="my-3 rounded-lg border border-line px-3 py-2" role="status" aria-live="polite" hidden></p>
 
-      <menu class="mt-2.5 text-right">
-        <button type="button" id="interest-cancel" class="mr-2.5 cursor-pointer py-1 text-sm text-link underline">Cancel</button>
-        <button type="submit" id="interest-submit" class="cursor-pointer border border-pine-dark bg-pine px-3.5 py-[7px] text-sm font-bold text-white hover:bg-pine-hover">Send</button>
+      <menu class="m-0 mt-4 flex flex-wrap items-center justify-end gap-3 p-0">
+        <button type="button" id="interest-cancel" class="min-h-11 cursor-pointer px-2 font-bold text-accent underline">Cancel</button>
+        <button type="submit" id="interest-submit" class="min-h-12 cursor-pointer rounded-btn bg-accent px-5.5 font-bold text-white hover:bg-accent-dark">Send</button>
       </menu>
     </form>
   </dialog>
 
-  <footer class="mt-10 border-t border-line bg-[#e8e8e8] text-[13px] text-muted">
-    <div class="mx-auto max-w-[800px] px-4 pt-3.5 pb-[18px]">
-      <p>Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
-      <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a></p>
+  <footer class="border-t border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-4 px-5 py-8 text-[15px] text-muted sm:px-8">
+      <p class="m-0">Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
+      <p class="m-0 flex gap-4"><a href="opportunities.html">Opportunities</a><a href="about.html">About Us</a><a href="privacy.html">Privacy</a></p>
     </div>
   </footer>
 
+  <script src="site.js"></script>
   <!-- A module, so the browser runs it only after lib.js (which it imports)
        has loaded. Modules also wait for the page to finish parsing. -->
   <script type="module" src="app.js"></script>

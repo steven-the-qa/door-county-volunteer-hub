@@ -2,32 +2,61 @@
    `npm run build:css` compiles this into css/site.css (gitignored), which is
    what the pages link to. CI runs that build before deploying to GitHub Pages.
    Styling lives as utility classes in the HTML and in app.js; this file only
-   holds the design tokens and a few plain-element defaults. */
+   holds the fonts, design tokens and a few plain-element defaults. */
 
 /* Only scan the public site — not worker/, cms-auth/, admin/ or docs. */
 @import "tailwindcss" source(none);
 @source "../index.html";
+@source "../opportunities.html";
 @source "../about.html";
 @source "../privacy.html";
 @source "../app.js";
+@source "../site.js";
+
+/* Fonts are served from /fonts (both SIL Open Font License), not Google
+   Fonts, so no third party sees visitors' requests. */
+@font-face {
+  font-family: "Isometra";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/isometra-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");
+}
 
 @theme {
-  --font-sans: Verdana, Geneva, Arial, sans-serif;
+  /* Isometra is display-only (one weight): logo, page and section headings. */
+  --font-display: "Isometra", Georgia, serif;
+  --font-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
 
-  /* Mobile-first breakpoint matching the old 520px max-width rule. */
-  --breakpoint-xs: 32.5rem;
+  /* Primary colour is white; secondary is Deep Cyan #00838F.
+     White text on Deep Cyan is 4.52:1 and Deep Cyan text on white the same,
+     so both pass WCAG AA. Body text colours are 7:1+ on white. */
+  --color-accent: #00838f;       /* buttons, links, outlines, logo */
+  --color-accent-dark: #006a74;  /* hover/pressed */
+  --color-ink: #043e44;          /* headings */
+  --color-text: #1c2b2b;         /* default text */
+  --color-body: #344848;         /* paragraphs */
+  --color-muted: #4a5e5e;        /* labels, small print */
+  --color-tint: #e9f5f7;         /* tag chips, soft panels */
+  --color-line: #cde7ea;         /* dividers, card borders */
+  --color-cube-top: #33cddb;     /* hero illustration */
+  --color-cube-dark: #005c64;
 
-  --color-page: #008080;        /* page background */
-  --color-header: #eddfff;      /* site header */
-  --color-ink: #222222;         /* body text */
-  --color-muted: #555555;       /* secondary text */
-  --color-line: #cccccc;        /* borders */
-  --color-link: #1a5276;
-  --color-pine: #2e5339;        /* primary button, dialog border */
-  --color-pine-dark: #1f3a28;
-  --color-pine-hover: #24422d;
+  /* Buttons: rounded rectangles. */
+  --radius-btn: 10px;
 
-  /* Loading screen: fade in after a short delay (see index.html). */
+  /* Loading screen: fade the spinner in after a short delay (see index.html). */
   --animate-fade-in: fade-in 0.2s ease-out 0.3s forwards;
   @keyframes fade-in {
     to {
@@ -36,24 +65,23 @@
   }
 }
 
-/* Plain-element defaults. Tailwind's reset strips heading sizes, paragraph
-   margins and list bullets; these put back the basics so the About/Privacy
-   prose reads normally without a class on every <p>. */
+/* Plain-element defaults. Tailwind's reset strips paragraph margins and list
+   bullets; these put back the basics so long-form pages (About, Privacy) read
+   normally without a class on every <p>. */
 @layer base {
   body {
-    @apply bg-page font-sans text-[15px]/normal text-ink;
+    @apply bg-white font-sans text-[17px]/[1.55] text-text;
   }
   a {
-    @apply text-link underline;
+    @apply text-accent underline;
   }
-  h1 {
-    @apply mt-5 mb-2.5 text-[26px] font-bold;
+  a:hover {
+    @apply text-accent-dark;
   }
-  h2 {
-    @apply mb-1.5 text-[19px] font-bold;
-  }
+  h1,
+  h2,
   h3 {
-    @apply text-[17px] font-bold;
+    @apply text-ink;
   }
   p,
   ul,
@@ -61,9 +89,9 @@
     @apply my-[1em];
   }
   ul {
-    @apply list-disc pl-10;
+    @apply list-disc pl-8;
   }
   ol {
-    @apply list-decimal pl-10;
+    @apply list-decimal pl-8;
   }
 }

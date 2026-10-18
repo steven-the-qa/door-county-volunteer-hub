@@ -10,7 +10,8 @@ See [PRD.md](PRD.md) for the full product/technical spec.
 ## How it works
 
 - `data/opportunities.json` holds organizations and their opportunities.
-- `app.js` fetches that file and renders the list in the browser, with filters.
+- `app.js` fetches that file and renders it in the browser: the newest
+  listings on the homepage, and the full list with filters on `opportunities.html`.
 - Only opportunities that are `status: "open"`, `verified: true`, and not past
   their `expiresDate` (when one is set) are shown.
 - The "Express interest" form posts to a Cloudflare Worker
@@ -21,8 +22,12 @@ See [PRD.md](PRD.md) for the full product/technical spec.
   [Admin panel](#admin-panel) below.
 
 ```
-index.html · about.html · privacy.html   static pages
-app.js                                   one script — no framework
+index.html                               homepage: hero, newest listings (carousel), For organizations
+opportunities.html                       every listing, with filters
+about.html · privacy.html                About Us (incl. contact) and Privacy
+app.js                                   renders listings + the interest form — no framework
+site.js                                  shared bits (the phone Menu button)
+fonts/                                   Isometra + Atkinson Hyperlegible (OFL), self-hosted
 css/input.css                             Tailwind source: theme tokens + element defaults
 css/site.css                              compiled CSS (gitignored; built locally or in CI)
 package.json                              Tailwind CLI + npm scripts

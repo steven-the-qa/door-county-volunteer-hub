@@ -1,7 +1,12 @@
 /* Door County Volunteer Hub — renders opportunities from data/opportunities.json.
    No framework. Styling is Tailwind utility classes (see CLS below).
    Loaded as a module (<script type="module">) so this import is guaranteed
-   to be ready before any code below runs. */
+   to be ready before any code below runs.
+
+   Used by two pages; each part only runs if its elements are on the page:
+   - index.html:         #carousel — the newest listings, plus "See more"
+   - opportunities.html: #opportunity-list — every listing, with filters
+   Both pages share the loading screen and the "Express interest" dialog. */
 
 import { isLive as isLiveOn } from "./lib.js";
 
@@ -14,22 +19,29 @@ import { isLive as isLiveOn } from "./lib.js";
 
   var DATA_URL = "data/opportunities.json";
 
+  // How many listings the homepage carousel shows before "See more".
+  var CAROUSEL_LIMIT = 6;
+
   // Tailwind utility classes for elements this script creates or restyles.
   // Keep them as complete literal strings: Tailwind finds classes by scanning
   // this file, so never build a class name by concatenating pieces.
   var CLS = {
-    card: "mb-3.5 border border-line bg-white p-4",
-    title: "mt-0",
-    org: "mt-0 mb-2.5 font-bold text-muted",
-    desc: "mt-0 mb-3",
-    dl: "mt-0 mb-3 text-sm",
-    dt: "font-bold text-muted xs:float-left xs:clear-left xs:w-[110px]",
-    dd: "mb-2 xs:mb-0.5 xs:pl-[120px]",
-    tags: "mt-0 mb-3 list-none p-0",
-    tag: "mr-1 inline-block border border-line bg-[#eeeeee] px-1.5 py-px text-xs",
-    button: "cursor-pointer border border-pine-dark bg-pine px-3.5 py-[7px] text-sm font-bold text-white hover:bg-pine-hover",
-    statusBase: "my-2.5 border px-2.5 py-2",
-    statusOk: "border-pine bg-[#e6f0e8]",
+    card: "flex flex-col gap-3.5 rounded-[14px] border border-line bg-white p-5 sm:p-7",
+    carouselCard: "flex flex-col gap-3.5 rounded-[14px] border border-line bg-white p-5 sm:flex-[0_0_min(460px,85%)] sm:snap-start sm:p-7",
+    org: "m-0 text-[15px] font-bold text-accent",
+    orgLink: "text-accent",
+    title: "m-0 text-2xl/tight font-bold text-ink sm:text-[25px]/[1.2]",
+    desc: "m-0 text-body",
+    dl: "m-0 grid grid-cols-1 text-[15px] sm:grid-cols-[120px_1fr] sm:gap-x-3 sm:gap-y-1",
+    dt: "mt-2.5 font-bold text-muted first:mt-0 sm:mt-0",
+    dd: "m-0",
+    tags: "m-0 flex list-none flex-wrap gap-1.5 p-0",
+    tag: "rounded-md bg-tint px-2.5 py-0.5 text-sm text-ink",
+    actions: "pt-1.5",
+    button: "min-h-12 w-full cursor-pointer rounded-btn bg-accent px-5.5 font-bold text-white hover:bg-accent-dark sm:w-auto",
+    statusBase: "my-3 rounded-lg border px-3 py-2",
+    statusIdle: "border-line",
+    statusOk: "border-accent bg-tint",
     statusError: "border-[#b33] bg-[#fbe3e3]"
   };
 
@@ -39,19 +51,29 @@ import { isLive as isLiveOn } from "./lib.js";
     "flexible": "Flexible"
   };
 
-  // --- Element handles ---------------------------------------------------
-  var listEl = document.getElementById("opportunity-list");
+  // --- Element handles (any may be missing, depending on the page) -------
+  var loadingEl = document.getElementById("page-loading");
   var countEl = document.getElementById("result-count");
   var emptyEl = document.getElementById("empty-state");
   var errorEl = document.getElementById("load-error");
   var demoBanner = document.getElementById("demo-banner");
+
+  // index.html
+  var carouselEl = document.getElementById("carousel");
+  var seeMoreEl = document.getElementById("see-more");
+  var arrowsEl = document.getElementById("carousel-arrows");
+  var prevBtn = document.getElementById("carousel-prev");
+  var nextBtn = document.getElementById("carousel-next");
+
+  // opportunities.html
+  var listEl = document.getElementById("opportunity-list");
+  var filtersEl = document.getElementById("filters");
   var orgSelect = document.getElementById("filter-org");
   var catSelect = document.getElementById("filter-category");
   var commitSelect = document.getElementById("filter-commitment");
   var resetBtn = document.getElementById("filter-reset");
-  var filtersEl = document.getElementById("filters");
-  var loadingEl = document.getElementById("page-loading");
 
+  // Interest dialog (both pages)
   var dialog = document.getElementById("interest-dialog");
   var form = document.getElementById("interest-form");
   var dialogOpportunity = document.getElementById("dialog-opportunity");
@@ -91,8 +113,73 @@ import { isLive as isLiveOn } from "./lib.js";
     return node;
   }
 
+  function countText(n) {
+    return n + (n === 1 ? " verified opportunity" : " verified opportunities");
+  }
 
-  // --- URL <-> filter sync -------------------------------------------
+  // --- Cards -------------------------------------------------------------
+  // tag: "li" in the full list, "article" in the carousel.
+  function buildCard(op, tag, cardClass) {
+    var org = state.orgs[op.orgId] || { name: "Unknown organization" };
+
+    var orgLine = org.website
+      ? el("p", { class: CLS.org }, [el("a", { class: CLS.orgLink, href: org.website, rel: "noopener", target: "_blank" }, [org.name])])
+      : el("p", { class: CLS.org, text: org.name });
+
+    var dl = el("dl", { class: CLS.dl }, []);
+    function row(term, value) {
+      if (!value && value !== 0) return;
+      dl.appendChild(el("dt", { class: CLS.dt, text: term }));
+      dl.appendChild(el("dd", { class: CLS.dd, text: String(value) }));
+    }
+    row("Commitment", COMMITMENT_LABEL[op.commitment] || op.commitment);
+    row("When", op.schedule);
+    row("Where", op.location || org.location);
+    if (op.minAge) row("Minimum age", op.minAge);
+
+    var btn = el("button", { type: "button", class: CLS.button }, ["Express interest"]);
+    btn.addEventListener("click", function () { openDialog(op, org); });
+
+    var card = el(tag, { class: cardClass, id: op.id }, [
+      orgLine,
+      el("h3", { class: CLS.title, text: op.title }),
+      el("p", { class: CLS.desc, text: op.description }),
+      dl
+    ]);
+    if ((op.categories || []).length) {
+      card.appendChild(el("ul", { class: CLS.tags, "aria-label": "Categories" }, op.categories.map(function (c) {
+        return el("li", { class: CLS.tag, text: c });
+      })));
+    }
+    card.appendChild(el("div", { class: CLS.actions }, [btn]));
+    return card;
+  }
+
+  // --- Homepage carousel -----------------------------------------------
+  function renderCarousel() {
+    var shown = state.opportunities.slice(0, CAROUSEL_LIMIT);
+    shown.forEach(function (op) {
+      carouselEl.insertBefore(buildCard(op, "article", CLS.carouselCard), seeMoreEl);
+    });
+    // Inserting cards in front of "See more" makes the browser keep that
+    // snapped item in view, which leaves the row scrolled. Start at the first card.
+    carouselEl.scrollTo({ left: 0, behavior: "instant" });
+    if (countEl) countEl.textContent = countText(state.opportunities.length);
+
+    if (!shown.length) {
+      carouselEl.hidden = true;
+      if (arrowsEl) arrowsEl.hidden = true;
+      if (emptyEl) emptyEl.hidden = false;
+    }
+
+    function scrollBy(dir) {
+      carouselEl.scrollBy({ left: dir * carouselEl.clientWidth * 0.8, behavior: "smooth" });
+    }
+    if (prevBtn) prevBtn.addEventListener("click", function () { scrollBy(-1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { scrollBy(1); });
+  }
+
+  // --- Full list with filters (opportunities.html) -----------------------
   function readFiltersFromURL() {
     var p = new URLSearchParams(location.search);
     if (p.get("org")) orgSelect.value = p.get("org");
@@ -109,44 +196,6 @@ import { isLive as isLiveOn } from "./lib.js";
     history.replaceState(null, "", qs ? "?" + qs : location.pathname);
   }
 
-  // --- Rendering ------------------------------------------------------
-  function buildCard(op) {
-    var org = state.orgs[op.orgId] || { name: "Unknown organization" };
-
-    var orgLine = org.website
-      ? el("p", { class: CLS.org }, [el("a", { href: org.website, rel: "noopener", target: "_blank" }, [org.name])])
-      : el("p", { class: CLS.org, text: org.name });
-
-    var dl = el("dl", { class: CLS.dl }, []);
-    function row(term, value) {
-      if (!value && value !== 0) return;
-      dl.appendChild(el("dt", { class: CLS.dt, text: term }));
-      dl.appendChild(el("dd", { class: CLS.dd, text: String(value) }));
-    }
-    row("Commitment", COMMITMENT_LABEL[op.commitment] || op.commitment);
-    row("When", op.schedule);
-    row("Where", op.location || org.location);
-    if (op.minAge) row("Minimum age", op.minAge);
-    row("Posted", op.postedDate);
-
-    var tags = el("ul", { class: CLS.tags }, (op.categories || []).map(function (c) {
-      return el("li", { class: CLS.tag, text: c });
-    }));
-
-    var btn = el("button", { type: "button", class: CLS.button }, ["Express interest"]);
-    btn.addEventListener("click", function () { openDialog(op, org); });
-
-    var card = el("li", { class: CLS.card, id: op.id }, [
-      el("h2", { class: CLS.title, text: op.title }),
-      orgLine,
-      el("p", { class: CLS.desc, text: op.description }),
-      dl
-    ]);
-    if ((op.categories || []).length) card.appendChild(tags);
-    card.appendChild(btn);
-    return card;
-  }
-
   function applyFilters() {
     var org = orgSelect.value;
     var cat = catSelect.value;
@@ -160,15 +209,13 @@ import { isLive as isLiveOn } from "./lib.js";
     });
 
     listEl.innerHTML = "";
-    visible.forEach(function (op) { listEl.appendChild(buildCard(op)); });
+    visible.forEach(function (op) { listEl.appendChild(buildCard(op, "li", CLS.card)); });
 
     emptyEl.hidden = visible.length !== 0;
     var total = state.opportunities.length;
-    if (visible.length === total) {
-      countEl.textContent = total + (total === 1 ? " opportunity" : " opportunities");
-    } else {
-      countEl.textContent = "Showing " + visible.length + " of " + total;
-    }
+    countEl.textContent = visible.length === total
+      ? countText(total)
+      : "Showing " + visible.length + " of " + total;
 
     writeFiltersToURL();
   }
@@ -193,11 +240,26 @@ import { isLive as isLiveOn } from "./lib.js";
     });
   }
 
+  function renderList(data) {
+    populateFilters(data);
+    readFiltersFromURL();
+    applyFilters();
+    filtersEl.hidden = false;
+
+    [orgSelect, catSelect, commitSelect].forEach(function (s) {
+      s.addEventListener("change", applyFilters);
+    });
+    resetBtn.addEventListener("click", function () {
+      orgSelect.value = ""; catSelect.value = ""; commitSelect.value = "";
+      applyFilters();
+    });
+  }
+
   // --- Interest dialog ----------------------------------------------
   function openDialog(op, org) {
     form.reset();
     formStatus.hidden = true;
-    formStatus.className = CLS.statusBase + " border-line";
+    formStatus.className = CLS.statusBase + " " + CLS.statusIdle;
     submitBtn.disabled = false;
     submitBtn.hidden = false;
     submitBtn.textContent = "Send";
@@ -282,35 +344,28 @@ import { isLive as isLiveOn } from "./lib.js";
     state.opportunities = (data.opportunities || []).filter(isLive)
       .sort(function (a, b) { return (b.postedDate || "").localeCompare(a.postedDate || ""); });
 
-    if (data.meta && data.meta.demoData) demoBanner.hidden = false;
+    if (demoBanner && data.meta && data.meta.demoData) demoBanner.hidden = false;
 
-    populateFilters(data);
-    readFiltersFromURL();
-    applyFilters();
-    filtersEl.hidden = false;
-    loadingEl.hidden = true;
+    if (carouselEl) renderCarousel();
+    if (listEl) renderList(data);
 
-    [orgSelect, catSelect, commitSelect].forEach(function (s) {
-      s.addEventListener("change", applyFilters);
-    });
-    resetBtn.addEventListener("click", function () {
-      orgSelect.value = ""; catSelect.value = ""; commitSelect.value = "";
-      applyFilters();
-    });
+    if (dialog) {
+      form.addEventListener("submit", handleSubmit);
+      cancelBtn.addEventListener("click", closeDialog);
+      dialog.addEventListener("click", function (e) {
+        if (e.target === dialog) closeDialog(); // click on backdrop
+      });
+    }
 
-    form.addEventListener("submit", handleSubmit);
-    cancelBtn.addEventListener("click", closeDialog);
-    dialog.addEventListener("click", function (e) {
-      if (e.target === dialog) closeDialog(); // click on backdrop
-    });
+    if (loadingEl) loadingEl.hidden = true;
   }
 
   function showLoadError() {
-    loadingEl.hidden = true;
-    listEl.hidden = true;
-    countEl.hidden = true;
-    filtersEl.hidden = true;
-    errorEl.hidden = false;
+    if (loadingEl) loadingEl.hidden = true;
+    [carouselEl, arrowsEl, listEl, countEl, filtersEl].forEach(function (node) {
+      if (node) node.hidden = true;
+    });
+    if (errorEl) errorEl.hidden = false;
   }
 
   // Download/parse failures and bugs in our own rendering code are logged

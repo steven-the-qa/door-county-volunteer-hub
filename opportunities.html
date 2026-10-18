@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volunteer Opportunities — Door County Volunteer Hub</title>
+  <meta name="description" content="Every current, verified volunteer opportunity with nonprofits in Door County, Wisconsin. Filter by organization, cause and commitment." />
+  <link rel="preload" href="fonts/isometra-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+  <!-- Full-screen loading screen; see index.html. -->
+  <div id="page-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-white text-ink" role="status">
+    <div class="flex animate-fade-in flex-col items-center gap-4 opacity-0 motion-reduce:animate-none motion-reduce:opacity-100">
+      <div class="size-10 animate-spin rounded-full border-4 border-accent/25 border-t-accent motion-reduce:animate-none" aria-hidden="true"></div>
+      <p class="m-0 text-lg font-bold">Loading opportunities…</p>
+    </div>
+  </div>
+
+  <a class="absolute -left-[1000px] focus:static focus:m-2 focus:inline-block" href="#opportunities">Skip to opportunities</a>
+
+  <header class="border-b border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-[18px]">
+      <a class="font-display text-xl/[1.1] text-accent no-underline sm:text-2xl/[1.1]" href="index.html">Door County<br />Volunteer Hub</a>
+      <nav aria-label="Primary" class="hidden items-center gap-2 sm:flex">
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent px-4 font-bold text-accent no-underline hover:bg-tint" href="about.html">About Us</a>
+        <a class="inline-flex min-h-11 items-center rounded-btn border-2 border-accent px-4 font-bold text-accent no-underline hover:bg-tint" href="index.html#organizations">For Organizations</a>
+      </nav>
+      <button type="button" id="menu-button" aria-expanded="false" aria-controls="mobile-menu" class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-btn border-2 border-accent bg-white px-3.5 font-bold text-accent sm:hidden">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+        Menu
+      </button>
+    </div>
+    <nav id="mobile-menu" aria-label="Primary" class="flex flex-col border-t border-line px-5 pt-1 pb-3 sm:hidden" hidden>
+      <a class="flex min-h-13 items-center border-b border-line font-bold text-accent no-underline" href="about.html">About Us</a>
+      <a class="flex min-h-13 items-center font-bold text-accent no-underline" href="index.html#organizations">For Organizations</a>
+    </nav>
+  </header>
+
+  <main class="mx-auto flex max-w-[1200px] flex-col gap-6 px-5 pt-9 pb-13 sm:px-8 sm:pt-14 sm:pb-20">
+    <div class="flex flex-col gap-2">
+      <h1 class="m-0 font-display text-[34px]/[1.05] font-normal sm:text-5xl/[1.05]">Volunteer opportunities</h1>
+      <p class="m-0 max-w-[620px] text-lg text-body">Every listing here is open now and has been confirmed with the organization. Find something that fits and send us your name and email.</p>
+    </div>
+
+    <p id="demo-banner" class="m-0 rounded-[14px] border border-[#e0c97f] bg-[#fff8e1] px-4 py-3" hidden>
+      Heads up: this list is showing <strong>test data</strong> only — none of these
+      are real opportunities. Real listings are coming soon.
+    </p>
+
+    <!-- Hidden until the data loads: the dropdowns are filled in from the JSON. -->
+    <section id="filters" class="flex flex-col gap-4 rounded-[14px] bg-tint p-4 sm:flex-row sm:flex-wrap sm:items-end sm:p-5" aria-label="Filter opportunities" hidden>
+      <div class="flex flex-col gap-1">
+        <label class="text-[15px] font-bold text-ink" for="filter-org">Organization</label>
+        <select class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base sm:w-auto" id="filter-org"><option value="">All organizations</option></select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[15px] font-bold text-ink" for="filter-category">Cause</label>
+        <select class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base sm:w-auto" id="filter-category"><option value="">All causes</option></select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[15px] font-bold text-ink" for="filter-commitment">Commitment</label>
+        <select class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base sm:w-auto" id="filter-commitment">
+          <option value="">Any commitment</option>
+          <option value="one-time">One-time</option>
+          <option value="recurring">Recurring</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
+      <button type="button" id="filter-reset" class="min-h-11 cursor-pointer self-start px-1 font-bold text-accent underline sm:self-auto">Reset filters</button>
+    </section>
+
+    <p id="result-count" class="m-0 text-body" aria-live="polite"></p>
+
+    <section id="opportunities" aria-label="Opportunities">
+      <ol id="opportunity-list" class="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:gap-6 md:grid-cols-2"></ol>
+
+      <p id="empty-state" class="m-0 rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body" hidden>
+        No opportunities match those filters right now.
+      </p>
+
+      <div id="load-error" class="rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body" hidden>
+        <p class="m-0">We couldn't load the opportunity list right now. Please refresh the page or check back soon.</p>
+      </div>
+
+      <noscript>
+        <style>#page-loading { display: none; }</style>
+        <p class="m-0 rounded-[14px] border border-dashed border-line bg-tint p-6 text-center text-body">This list needs JavaScript to load. Please enable JavaScript and refresh.</p>
+      </noscript>
+    </section>
+  </main>
+
+  <dialog id="interest-dialog" class="m-auto w-[calc(100%-2rem)] max-w-[440px] rounded-[14px] border-0 p-0 shadow-xl backdrop:bg-black/50">
+    <form id="interest-form" method="dialog" class="p-6">
+      <h2 class="mt-0 mb-2 text-2xl font-bold">Express interest</h2>
+      <p class="mt-0 text-body">
+        You're interested in <strong id="dialog-opportunity">this opportunity</strong>
+        at <strong id="dialog-org">the organization</strong>.
+      </p>
+
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-first">First name</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-first" name="firstName" type="text" autocomplete="given-name" required />
+      </div>
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-last">Last name</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-last" name="lastName" type="text" autocomplete="family-name" required />
+      </div>
+      <div class="mb-3">
+        <label class="mb-1 block text-[15px] font-bold" for="f-email">Email</label>
+        <input class="min-h-11 w-full rounded-lg border border-muted bg-white px-3 text-base" id="f-email" name="email" type="email" autocomplete="email" required />
+      </div>
+
+      <!-- honeypot: real people leave this empty -->
+      <input type="text" name="company" tabindex="-1" autocomplete="off" class="absolute! -left-[9999px]! h-px w-px overflow-hidden" aria-hidden="true" />
+
+      <p class="text-sm text-muted">
+        By submitting, you agree we can share your name and email with this
+        organization so they can follow up about volunteering.
+      </p>
+
+      <p id="form-status" class="my-3 rounded-lg border border-line px-3 py-2" role="status" aria-live="polite" hidden></p>
+
+      <menu class="m-0 mt-4 flex flex-wrap items-center justify-end gap-3 p-0">
+        <button type="button" id="interest-cancel" class="min-h-11 cursor-pointer px-2 font-bold text-accent underline">Cancel</button>
+        <button type="submit" id="interest-submit" class="min-h-12 cursor-pointer rounded-btn bg-accent px-5.5 font-bold text-white hover:bg-accent-dark">Send</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <footer class="border-t border-line bg-white">
+    <div class="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-4 px-5 py-8 text-[15px] text-muted sm:px-8">
+      <p class="m-0">Door County Volunteer Hub — a volunteer-run project by Sam &amp; Steven.</p>
+      <p class="m-0 flex gap-4"><a href="opportunities.html" aria-current="page">Opportunities</a><a href="about.html">About Us</a><a href="privacy.html">Privacy</a></p>
+    </div>
+  </footer>
+
+  <script src="site.js"></script>
+  <!-- A module, so the browser runs it only after lib.js (which it imports)
+       has loaded. Modules also wait for the page to finish parsing. -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
